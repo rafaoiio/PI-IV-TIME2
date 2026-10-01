@@ -1,0 +1,19 @@
+{
+  "name": "sistema-gestao-desperdicio-alimentos",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tailwindcss -i ./public/css/input.css -o ./public/css/style.css --watch",
+    "build":"tailwindcss -i ./public/css/input.css -o ./public/css/style.css --minify"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}

@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@source "../../views";
+
+@theme {
+  /* =========================
+       TIPOGRAFIA
+    ========================== */
+
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  --text-title: 3rem;
+  /* 48px */
+  --text-title--line-height: normal;
+
+  --text-subtitle: 1.5rem;
+  /* 24px */
+  --text-subtitle--line-height: normal;
+
+  --text-body: 1.125rem;
+  /* 18px */
+  --text-body--line-height: normal;
+
+  --text-label: 0.875rem;
+  /* 14px */
+  --text-label--line-height: normal;
+
+  --text-table: 0.75rem;
+  /* 12px */
+  --text-table--line-height: normal;
+
+
+  /* =========================
+       CORES
+    ========================== */
+
+  --color-primary: #1F6F78;
+  --color-primary-dark: #195A61;
+  --color-primary-darker: #14474C;
+  --color-primary-light: #E7F3F4;
+  --color-primary-lighter: #F3F9FA;
+
+  --color-background: #EAEAEA;
+  --color-border: #D6E2E4;
+
+  --color-text: #1F2937;
+  --color-text-secondary: #6B7280;
+  --color-text-disabled: #9CA3AF;
+
+  --color-success: #16A34A;
+  --color-warning: #F59E0B;
+  --color-danger: #DC2626;
+  --color-info: #2563EB;
+}
