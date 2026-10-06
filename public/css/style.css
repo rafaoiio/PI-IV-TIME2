@@ -243,6 +243,9 @@
   .mb-6 {
     margin-bottom: calc(var(--spacing) * 6);
   }
+  .mb-8 {
+    margin-bottom: calc(var(--spacing) * 8);
+  }
   .mb-9 {
     margin-bottom: calc(var(--spacing) * 9);
   }
@@ -607,6 +610,9 @@
   }
   .text-\[18px\] {
     font-size: 18px;
+  }
+  .text-\[26px\] {
+    font-size: 26px;
   }
   .leading-\[13px\] {
     --tw-leading: 13px;
