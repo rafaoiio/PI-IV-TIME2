@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@source "../../views";
+@source "../../views/**/*.html";
 
 @theme {
   /* =========================
@@ -21,7 +21,7 @@
   /* 18px */
   --text-body--line-height: normal;
 
-  --text-label: 0.875rem;
+  --text-label: 0.9375rem;
   /* 14px */
   --text-label--line-height: normal;
 

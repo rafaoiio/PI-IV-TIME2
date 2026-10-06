@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Cadastro | PsicomManager</title>
+
+  <link
+    rel="stylesheet"
+    href="../../public/css/style.css"
+  >
+</head>
+
+
+<body
+  class="min-h-screen bg-[#202020] p-2 font-sans"
+>
+
+  <!-- ========================================= -->
+  <!-- CONTAINER PRINCIPAL                       -->
+  <!-- ========================================= -->
+
+  <main
+    class="
+      grid
+      min-h-[calc(100vh-16px)]
+      grid-cols-1
+      overflow-hidden
+      bg-background
+
+      lg:grid-cols-[36%_64%]
+    "
+  >
+
+
+    <!-- ========================================= -->
+    <!-- LADO ESQUERDO                             -->
+    <!-- ========================================= -->
+
+    <section
+      class="
+        flex
+        min-h-[calc(100vh-16px)]
+        items-center
+        justify-center
+        bg-[#D7DEE0]
+        px-8
+        py-12
+
+        lg:min-h-0
+        lg:rounded-r-[24px]
+      "
+    >
+
+      <form
+        id="formCadastro"
+        class="w-[64%] max-w-[420px]"
+        novalidate
+      >
+
+        <!-- Nome completo -->
+        <div class="mb-5">
+
+          <label
+            for="nome"
+            class="mb-1.5 block text-label text-text"
+          >
+            Nome completo
+            <span class="text-danger">*</span>
+          </label>
+
+          <input
+            id="nome"
+            name="nome"
+            type="text"
+
+            placeholder="Digite aqui"
+            autocomplete="name"
+
+            required
+            minlength="3"
+            maxlength="100"
+
+            class="
+              h-[32px]
+              w-full
+              rounded-[4px]
+              border
+              border-border
+              bg-[#E2E7E8]
+              px-3
+              text-[13px]
+              text-text
+              outline-none
+              placeholder:text-text-secondary
+              transition
+              focus:border-primary
+              focus:ring-1
+              focus:ring-primary/20
+            "
+          >
+
+          <p
+            id="erroNome"
+            class="mt-1 hidden text-[11px] text-danger"
+          ></p>
+
+        </div>
+
+
+
+        <!-- E-mail -->
+        <div class="mb-5">
+
+          <label
+            for="email"
+            class="mb-1.5 block text-label text-text"
+          >
+            E-mail
+            <span class="text-danger">*</span>
+          </label>
+
+          <input
+            id="email"
+            name="email"
+            type="email"
+
+            placeholder="Digite aqui"
+            autocomplete="email"
+
+            required
+            maxlength="150"
+
+            class="
+              h-[32px]
+              w-full
+              rounded-[4px]
+              border
+              border-border
+              bg-[#E2E7E8]
+              px-3
+              text-[13px]
+              text-text
+              outline-none
+              placeholder:text-text-secondary
+              transition
+              focus:border-primary
+              focus:ring-1
+              focus:ring-primary/20
+            "
+          >
+
+          <p
+            id="erroEmail"
+            class="mt-1 hidden text-[11px] text-danger"
+          ></p>
+
+
+        </div>
+
+
+
+
+        <!-- Celular / WhatsApp -->
+        <div class="mb-5">
+
+          <label
+            for="celular"
+            class="mb-1.5 block text-label text-text"
+          >
+            Celular / WhatsApp
+            <span class="text-danger">*</span>
+          </label>
+
+          <input
+            id="celular"
+            name="celular"
+            type="tel"
+
+            placeholder="+55 (19) 99999-9999"
+            autocomplete="tel"
+
+            inputmode="numeric"
+
+            required
+            maxlength="19"
+
+            class="
+              h-[32px]
+              w-full
+              rounded-[4px]
+              border
+              border-border
+              bg-[#E2E7E8]
+              px-3
+              text-[13px]
+              text-text
+              outline-none
+              placeholder:text-text-secondary
+              transition
+              focus:border-primary
+              focus:ring-1
+              focus:ring-primary/20
+            "
+          >
+
+          <p
+            id="erroCelular"
+            class="mt-1 hidden text-[11px] text-danger"
+          ></p>
+
+        </div>
+
+
+
+        <!-- Botão de envio -->
+        <button
+          type="submit"
+
+          class="
+            flex
+            h-[36px]
+            w-full
+
+            items-center
+            justify-center
+
+            rounded-[7px]
+
+            bg-primary
+
+            text-[18px]
+            font-normal
+            text-white
+
+            transition
+
+            hover:bg-primary-dark
+
+            active:scale-[0.99]
+          "
+        >
+          Próximo
+        </button>
+
+
+
+        <!-- ================================= -->
+        <!-- TERMOS                            -->
+        <!-- ================================= -->
+
+        <p
+          class="
+            mx-auto
+            mt-2
+
+            max-w-[240px]
+
+            text-center
+            text-[9px]
+            leading-[13px]
+
+            text-text
+          "
+        >
+
+          Ao informar meus dados, eu concordo com a
+
+          <a
+            href="#"
+            class="
+              underline
+              hover:text-primary
+            "
+          >
+            Política de Privacidade
+          </a>
+
+          e
+
+          <a
+            href="#"
+            class="
+              underline
+              hover:text-primary
+            "
+          >
+            Termos de Uso
+          </a>
+
+          do PsicomManager
+
+        </p>
+
+      </form>
+
+    </section>
+
+
+
+    <!-- ========================================= -->
+    <!-- LADO DIREITO                              -->
+    <!-- ========================================= -->
+
+    <section
+      class="
+        relative
+        hidden
+        min-h-0
+        overflow-hidden
+
+        lg:block
+      "
+    >
+
+      <img
+        src="../../public/images/cadastro-bg.jpeg"
+
+        alt="Profissional utilizando um tablet"
+
+        class="
+          absolute
+          inset-0
+
+          h-full
+          w-full
+
+          object-cover
+          object-[32%_center]
+        "
+      >
+
+
+      <!-- Escurecimento semelhante ao protótipo -->
+
+      <div
+        class="
+          pointer-events-none
+          absolute
+          inset-0
+          bg-black/10
+        "
+      ></div>
+
+    </section>
+
+
+  </main>
+
+
+
+  <!-- ========================================= -->
+  <!-- JAVASCRIPT                                 -->
+  <!-- ========================================= -->
+  <script src="../../public/js/cadastro-de-usuario.js"></script>
+
+
+</body>
+
+</html>
