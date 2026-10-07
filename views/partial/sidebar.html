@@ -1,16 +1,19 @@
-<div class="flex min-h-screen w-[180px] flex-col bg-primary-dark text-white">
-  <div class="flex h-[167px] shrink-0 items-center justify-center bg-[#e9ebee] text-2xl font-semibold text-gray-950">
-    logo
+<div class="flex w-full flex-col bg-primary-dark text-white md:min-h-screen">
+  <div class="flex min-h-16 shrink-0 items-center justify-between gap-3 bg-[#e9ebee] px-4 text-gray-950 md:h-[167px] md:justify-center">
+    <span class="text-2xl font-semibold">logo</span>
+    <button type="button" data-mobile-menu-toggle aria-expanded="false" aria-controls="sidebar-navigation" class="min-h-11 cursor-pointer rounded bg-primary-dark px-4 text-sm font-semibold text-white hover:bg-primary-darker focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:hidden">
+      Menu
+    </button>
   </div>
 
-  <nav aria-label="Menu principal" class="flex flex-col gap-5 px-3 pt-7 text-xs font-semibold">
-    <a href="../pages/index.html" class="flex min-h-6 items-center gap-2 uppercase hover:text-primary-light">
+  <nav id="sidebar-navigation" aria-label="Menu principal" class="hidden flex-col gap-5 px-3 py-4 text-xs font-semibold md:flex md:pt-7">
+    <a href="../pages/dashboard.html" class="flex min-h-11 md:min-h-6 items-center gap-2 uppercase hover:text-primary-light">
       <img src="../../public/icons/home.svg" alt="" width="24" height="24" class="size-6 shrink-0">
       <span>Dashboard</span>
     </a>
 
     <section>
-      <button type="button" data-sidebar-toggle aria-expanded="false" aria-controls="sidebar-produtos" class="flex min-h-6 w-full cursor-pointer items-center gap-2 text-left uppercase">
+      <button type="button" data-sidebar-toggle aria-expanded="false" aria-controls="sidebar-produtos" class="flex min-h-11 md:min-h-6 w-full cursor-pointer items-center gap-2 text-left uppercase">
         <img src="../../public/icons/products.svg" alt="" width="24" height="24" class="size-6 shrink-0">
         <span class="flex-1">Produtos</span>
         <img src="../../public/icons/chevron-down.svg" alt="" width="12" height="12" data-sidebar-chevron class="size-3 shrink-0 transition-transform">
@@ -22,7 +25,7 @@
     </section>
 
     <section>
-      <button type="button" data-sidebar-toggle aria-expanded="false" aria-controls="sidebar-desperdicio" class="flex min-h-6 w-full cursor-pointer items-center gap-2 text-left uppercase">
+      <button type="button" data-sidebar-toggle aria-expanded="false" aria-controls="sidebar-desperdicio" class="flex min-h-11 md:min-h-6 w-full cursor-pointer items-center gap-2 text-left uppercase">
         <img src="../../public/icons/waste.svg" alt="" width="24" height="24" class="size-6 shrink-0">
         <span class="flex-1">Desperdício</span>
         <img src="../../public/icons/chevron-down.svg" alt="" width="12" height="12" data-sidebar-chevron class="size-3 shrink-0 transition-transform">
@@ -33,7 +36,7 @@
       </ul>
     </section>
 
-    <div class="flex min-h-6 items-center gap-2 uppercase">
+    <div class="flex min-h-11 md:min-h-6 items-center gap-2 uppercase">
       <img src="../../public/icons/reports.svg" alt="" width="24" height="24" class="size-6 shrink-0">
       <span>Relatórios</span>
     </div>
