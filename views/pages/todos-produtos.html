@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ALTERE O NOME EM CADA PÁGINA -->
+    <title>Todos os produtos | Sistema de Gestão e Redução de Desperdício</title>
+
+    <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+
+<body class="flex min-h-screen bg-background">
+
+    <aside id="aside-placeholder" class="w-[180px] shrink-0"></aside>
+
+    <div class="flex min-w-0 flex-1 flex-col">
+
+        <div id="header-placeholder"></div>
+
+        <main class="flex-1">
+            <div class="mx-auto w-full max-w-6xl px-6 py-8">
+
+                <h1 class="mb-6 text-2xl font-bold text-text-secondary md:text-3xl">
+                    Produtos / Todos os produtos
+                </h1>
+
+                <!-- CONTEÚDO DA PÁGINA -->
+                <section class="rounded-lg bg-white p-6 shadow-sm">
+
+                    <div class="mb-6 flex items-center justify-between">
+                        <h2 class="text-lg font-semibold text-text-secondary">
+                            Todos os produtos
+                        </h2>
+
+                        <button type="button"
+                            class="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-text-secondary">
+
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="px-2 py-2 font-medium">Título</th>
+                                    <th class="px-2 py-2 font-medium">Categoria</th>
+                                    <th class="px-2 py-2 font-medium">Quantidade</th>
+                                    <th class="px-2 py-2 font-medium">Validade</th>
+                                    <th class="px-2 py-2 font-medium">Status</th>
+                                    <th class="px-2 py-2 text-center font-medium">Ações</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr class="border-b">
+
+                                    <td class="px-2 py-3 font-semibold">
+                                        Leite
+                                    </td>
+
+                                    <td class="px-2 py-3">
+                                        Laticínio
+                                    </td>
+
+                                    <td class="px-2 py-3">
+                                        10 un.
+                                    </td>
+
+                                    <td class="px-2 py-3">
+                                        10/09/2026
+                                    </td>
+
+                                    <td class="px-2 py-3">
+                                        Vence hoje
+                                    </td>
+
+                                    <td class="px-2 py-3 text-center">
+                                        <div class="flex items-center justify-center gap-3">
+
+                                            <!-- Configurações -->
+                                            <button type="button" title="Configurações" class="text-primary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.592c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.219.127.325.197.72.258 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a6.759 6.759 0 0 1 0 .255c-.008.378.137.75.43.992l1.003.827c.424.35.534.955.26 1.43l-1.296 2.247a1.125 1.125 0 0 1-1.37.49l-1.217-.456c-.355-.133-.75-.073-1.075.124a6.57 6.57 0 0 1-.219.127c-.332.183-.582.495-.645.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.592c-.55 0-1.02-.397-1.11-.94l-.213-1.281a1.128 1.128 0 0 0-.645-.87 6.52 6.52 0 0 1-.219-.126c-.325-.198-.72-.258-1.075-.125l-1.217.457a1.125 1.125 0 0 1-1.37-.49L3.6 15.876a1.125 1.125 0 0 1 .26-1.43l1.003-.827c.293-.242.438-.614.43-.992a6.759 6.759 0 0 1 0-.255c.008-.379-.137-.751-.43-.992L3.86 10.553a1.125 1.125 0 0 1-.26-1.431l1.296-2.247a1.125 1.125 0 0 1 1.37-.49l1.217.456c.355.134.75.073 1.075-.124.072-.044.145-.086.219-.127.332-.184.582-.496.645-.87l.213-1.28Z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                </svg>
+                                            </button>
+
+                                            <!-- Editar -->
+                                            <button type="button" title="Editar" class="text-primary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.862 4.487ZM16.862 4.487 19.5 7.125" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M18 14.25V19.5A1.5 1.5 0 0 1 16.5 21h-12A1.5 1.5 0 0 1 3 19.5v-12A1.5 1.5 0 0 1 4.5 6H9.75" />
+                                                </svg>
+                                            </button>
+
+                                            <!-- Excluir -->
+                                            <button type="button" title="Excluir" class="text-primary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673A2.25 2.25 0 0 1 15.916 21H8.084a2.25 2.25 0 0 1-2.244-1.327L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0V4.477c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0C9.16 2.313 8.25 3.297 8.25 4.477v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                                            </button>
+
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </section>
+
+            </div>
+        </main>
+
+        <div id="footer-placeholder"></div>
+    </div>
+
+    <script src="../../public/js/load-partials.js"></script>
+</body>
+
+</html>
