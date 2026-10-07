@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ALTERE O NOME EM CADA PÁGINA -->
+  <title>Relatórios | Gestão de Desperdício </title>
+
+  <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+
+<body class="flex min-h-screen flex-col bg-background md:flex-row">
+
+  <aside id="aside-placeholder" class="w-full shrink-0 md:w-[180px]"></aside>
+
+  <div class="flex min-w-0 flex-1 flex-col">
+
+    <div id="header-placeholder"></div>
+
+    <main class="flex-1">
+      <div class="w-full px-3 py-4 sm:px-6 sm:py-8">
+
+        <h1 class="mb-6 text-2xl font-bold text-text-secondary md:text-3xl">
+          Relatórios
+        </h1>
+
+          <div class="flex flex-wrap items-center gap-8 mt-5 justify-center">
+            <div class="bg-white rounded-xl shadow-md p-6 w-60 text-center transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl text-text font-semibold">
+              <h2>
+                Desperdiçados
+              </h2>
+              <p>
+                30
+              </p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 w-60 text-center transition-all duration-300 ease-in-out hover:-translate-y-1  hover:shadow-xl text-text font-semibold">
+              <h2>
+                Registrados
+              </h2>
+              <p>
+                100
+              </p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 w-60 text-center transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl text-text font-semibold">
+              <h2>
+                Perdas (R$)
+              </h2>
+              <p>
+                R$ 2.190
+              </p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 w-60 text-center transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl text-text font-semibold">
+              <h2>
+                Motivo
+              </h2>
+              <p>
+                Vencimento
+              </p>
+            </div>
+          </div>
+
+        <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <section class="min-w-0 rounded-xl bg-white p-4 text-text shadow-md">
+            <h2 class="text-center text-sm font-medium">Produtos mais desperdiçados</h2>
+            <div id="pizza-chart" class="mt-4"></div>
+          </section>
+
+          <section class="min-w-0 rounded-xl bg-white p-4 text-text shadow-md lg:col-span-2">
+            <h2 class="text-center text-sm font-medium">Qtd. por produtos desperdiçados</h2>
+            <div id="barras-chart" class="mt-4"></div>
+          </section>
+        </div>
+
+        <div class="mt-4 flex justify-end">
+          <button id="exportar-relatorio" type="button" class="cursor-pointer rounded-sm bg-primary px-6 py-2 text-xs text-white hover:bg-primary-dark">
+            Exportar
+          </button>
+        </div>
+
+      </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.46.0/dist/apexcharts.min.js"></script>
+  <script src="../../public/js/relatorios.js"></script>
+  <script src="../../public/js/load-partials.js"></script>
+</body>
+</html>
