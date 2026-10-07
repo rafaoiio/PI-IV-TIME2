@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Login | PsicomManager</title>
+
+  <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+
+<body class="min-h-screen bg-[#E5E5E5] font-sans">
+
+  <main
+    class="
+      flex
+      min-h-screen
+      items-center
+      justify-center
+      px-6
+      py-10
+    "
+  >
+
+    <section class="w-full max-w-[520px]">
+
+      <form
+        id="formLogin"
+        class="w-full"
+        novalidate
+      >
+
+        <!-- Título -->
+        <div class="mb-8">
+          <h1 class="text-[26px] font-semibold text-text">
+            Login
+          </h1>
+        </div>
+
+
+        <!-- E-mail -->
+        <div class="mb-5">
+
+          <label
+            for="email"
+            class="mb-1.5 block text-label text-text"
+          >
+            E-mail
+          </label>
+
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            maxlength="150"
+            autocomplete="email"
+            placeholder="Digite aqui"
+            aria-describedby="erroEmail"
+
+            class="
+              h-[32px]
+              w-full
+              rounded-[4px]
+              border
+              border-border
+              bg-[#E2E7E8]
+              px-3
+              text-[13px]
+              text-text
+              outline-none
+              placeholder:text-text-secondary
+              transition
+              focus:border-primary
+              aria-invalid:border-danger
+            "
+          >
+
+          <p
+            id="erroEmail"
+            class="
+              mt-1
+              hidden
+              text-[11px]
+              text-danger
+            "
+          ></p>
+
+        </div>
+
+
+        <!-- Senha -->
+        <div class="mb-2">
+
+          <label
+            for="senha"
+            class="mb-1.5 block text-label text-text"
+          >
+            Senha
+          </label>
+
+          <div class="relative">
+
+            <input
+              id="senha"
+              name="senha"
+              type="password"
+              required
+              autocomplete="current-password"
+              placeholder="Digite aqui"
+              aria-describedby="erroSenha"
+
+              class="
+                h-[32px]
+                w-full
+                rounded-[4px]
+                border
+                border-border
+                bg-[#E2E7E8]
+                px-3
+                pr-10
+                text-[13px]
+                text-text
+                outline-none
+                placeholder:text-text-secondary
+                transition
+                focus:border-primary
+                aria-invalid:border-danger
+              "
+            >
+
+            <button
+              id="btnMostrarSenha"
+              type="button"
+              aria-label="Mostrar senha"
+
+              class="
+                absolute
+                right-3
+                top-1/2
+                -translate-y-1/2
+                cursor-pointer
+                text-primary-darker
+              "
+            >
+              <svg
+                viewBox="0 0 24 24"
+                class="size-[18px]"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                aria-hidden="true"
+              >
+                <path
+                  d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z"
+                ></path>
+
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="2.8"
+                ></circle>
+              </svg>
+            </button>
+
+          </div>
+
+          <p
+            id="erroSenha"
+            class="
+              mt-1
+              hidden
+              text-[11px]
+              text-danger
+            "
+          ></p>
+
+        </div>
+
+
+        <!-- Esqueceu a senha -->
+        <div class="mb-6 text-right">
+
+          <a
+            href="#"
+            class="
+              text-[11px]
+              text-text-secondary
+              hover:text-primary
+              hover:underline
+            "
+          >
+            Esqueceu a senha?
+          </a>
+
+        </div>
+
+
+        <!-- Botão Entrar -->
+        <button
+          type="submit"
+          class="
+            flex
+            h-[36px]
+            w-full
+            items-center
+            justify-center
+            rounded-[7px]
+            bg-[#174F54]
+            text-[16px]
+            text-white
+            transition
+            hover:bg-[#123F43]
+            active:scale-[0.99]
+          "
+        >
+          Entrar
+        </button>
+
+
+        <!-- Criar conta -->
+        <p class="mt-3 text-center">
+
+          <a
+            href="../cadastro/cadastro.html"
+            class="
+              text-[11px]
+              text-text-secondary
+              underline
+              hover:text-primary
+            "
+          >
+            Criar uma nova conta
+          </a>
+
+        </p>
+
+      </form>
+
+    </section>
+
+  </main>
+
+  <script src="../../public/js/login.js"></script>
+
+</body>
+</html>
