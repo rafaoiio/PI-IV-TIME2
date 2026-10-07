@@ -17,9 +17,12 @@ async function loadPartial(partialUrl, placeholderId) {
 
 // utilizo a função criada para
 document.addEventListener("DOMContentLoaded", () => {
-  loadPartial("../partial/header.html", "header-placeholder");
-  loadPartial("../partial/footer.html", "footer-placeholder");
-  loadPartial("../partial/sidebar.html", "aside-placeholder");
+ loadPartial("/views/partial/header.html", "header-placeholder");
+
+  loadPartial("/views/partial/footer.html", "footer-placeholder");
+
+  loadPartial("/views/partial/sidebar.html", "aside-placeholder");
+
 });
 
 document.addEventListener("click", (event) => {
