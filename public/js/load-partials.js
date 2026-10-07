@@ -38,3 +38,33 @@ document.addEventListener("click", (event) => {
     ? "0deg"
     : "-90deg";
 });
+
+// O menu fica recolhido no celular e sempre visível a partir de 768px.
+document.addEventListener("click", (event) => {
+  const toggle = event.target.closest("[data-mobile-menu-toggle]");
+  if (!toggle) return;
+
+  const navigation = document.getElementById(
+    toggle.getAttribute("aria-controls"),
+  );
+  if (!navigation) return;
+
+  const expanded = toggle.getAttribute("aria-expanded") === "true";
+  toggle.setAttribute("aria-expanded", String(!expanded));
+  navigation.classList.toggle("hidden", expanded);
+  navigation.classList.toggle("flex", !expanded);
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+  const toggle = document.querySelector("[data-mobile-menu-toggle]");
+  if (
+    !toggle ||
+    toggle.getAttribute("aria-expanded") !== "true" ||
+    !window.matchMedia("(max-width: 767px)").matches
+  )
+    return;
+
+  toggle.click();
+  toggle.focus();
+});
