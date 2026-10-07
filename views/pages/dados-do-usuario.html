@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Dados do usuário | PsicomManager</title>
+
+  <link
+    rel="stylesheet"
+    href="../../public/css/style.css"
+  >
+</head>
+
+
+<body class="flex min-h-screen bg-background">
+
+  <!-- ====================================== -->
+  <!-- SIDEBAR                                -->
+  <!-- ====================================== -->
+
+  <aside
+    id="aside-placeholder"
+    class="w-[180px] shrink-0"
+  ></aside>
+
+
+  <!-- ====================================== -->
+  <!-- ÁREA PRINCIPAL                         -->
+  <!-- ====================================== -->
+
+  <div class="flex min-w-0 flex-1 flex-col">
+
+    <!-- Header -->
+    <div id="header-placeholder"></div>
+
+
+    <!-- ==================================== -->
+    <!-- CONTEÚDO DA PÁGINA                  -->
+    <!-- ==================================== -->
+
+    <main class="flex-1">
+
+      <div class="w-full px-8 pt-12 pb-8">
+
+        <!-- Título -->
+        <h1
+          class="
+            mb-9
+            text-[18px]
+            font-normal
+            text-text
+          "
+        >
+          Dados Usuário
+        </h1>
+
+
+        <!-- ================================== -->
+        <!-- CARD DO USUÁRIO                   -->
+        <!-- ================================== -->
+
+        <section
+          class="
+            grid
+            grid-cols-1
+            gap-6
+            rounded-[6px]
+            bg-[#E0E0E0]
+            px-7
+            py-4
+
+            lg:grid-cols-[1fr_1fr_130px]
+            lg:items-center
+          "
+        >
+
+
+          <!-- ================================= -->
+          <!-- COLUNA ESQUERDA                   -->
+          <!-- ================================= -->
+
+          <div>
+
+            <!-- Nome -->
+            <h2
+              id="nomeUsuario"
+              class="
+                mb-4
+                text-[18px]
+                font-normal
+                text-text
+              "
+            >
+              Fulano da Silva
+            </h2>
+
+
+            <!-- ================================= -->
+            <!-- E-MAIL                            -->
+            <!-- ================================= -->
+
+            <div class="mb-5">
+
+              <!-- Visualização -->
+              <div
+                id="visualizacaoEmail"
+                class="flex items-center gap-2"
+              >
+
+                <p class="text-[13px] text-text">
+
+                  <span class="font-semibold">
+                    E-mail:
+                  </span>
+
+                  <span id="emailUsuario">
+                    fulano@gmail.com
+                  </span>
+
+                </p>
+
+
+                <button
+                  id="btnEditarEmail"
+                  type="button"
+                  aria-label="Editar e-mail"
+
+                  class="
+                    flex
+                    size-6
+                    cursor-pointer
+                    items-center
+                    justify-center
+                    text-primary-darker
+                    transition
+                    hover:scale-110
+                  "
+                >
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    class="size-[18px]"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm17.71-10.04a.996.996 0 0 0 0-1.41l-2.5-2.5a.996.996 0 0 0-1.41 0l-1.96 1.96 3.75 3.75 2.12-1.8Z"
+                    />
+                  </svg>
+
+                </button>
+
+              </div>
+
+
+              <!-- Edição -->
+              <div
+                id="edicaoEmail"
+                class="hidden"
+              >
+
+                <input
+                  id="inputEmailUsuario"
+                  type="email"
+                  required
+                  maxlength="150"
+                  autocomplete="email"
+                  aria-describedby="erroEmailUsuario"
+
+                  class="
+                    h-[32px]
+                    w-full
+                    max-w-[280px]
+                    rounded-[4px]
+                    border
+                    border-border
+                    bg-white
+                    px-3
+                    text-[13px]
+                    text-text
+                    outline-none
+                    focus:border-primary
+                    aria-invalid:border-danger
+                  "
+                >
+
+
+                <p
+                  id="erroEmailUsuario"
+                  class="
+                    mt-1
+                    hidden
+                    text-[11px]
+                    text-danger
+                  "
+                ></p>
+
+
+                <div class="mt-2 flex gap-2">
+
+                  <button
+                    id="btnSalvarEmail"
+                    type="button"
+
+                    class="
+                      rounded-[4px]
+                      bg-primary
+                      px-3
+                      py-1
+                      text-[11px]
+                      text-white
+                      transition
+                      hover:bg-primary-dark
+                    "
+                  >
+                    Salvar
+                  </button>
+
+
+                  <button
+                    id="btnCancelarEmail"
+                    type="button"
+
+                    class="
+                      rounded-[4px]
+                      border
+                      border-border
+                      px-3
+                      py-1
+                      text-[11px]
+                      text-text
+                      transition
+                      hover:bg-white/60
+                    "
+                  >
+                    Cancelar
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- Cargo -->
+            <p class="text-[13px] text-text">
+
+              <span class="font-semibold">
+                Cargo:
+              </span>
+
+              <span id="cargoUsuario">
+                Estoquista
+              </span>
+
+            </p>
+
+          </div>
+
+
+
+          <!-- ================================= -->
+          <!-- COLUNA CENTRAL                    -->
+          <!-- ================================= -->
+
+          <div class="lg:pt-9">
+
+
+            <!-- ================================= -->
+            <!-- TELEFONE                          -->
+            <!-- ================================= -->
+
+            <div class="mb-5">
+
+              <!-- Visualização -->
+              <div
+                id="visualizacaoTelefone"
+                class="flex items-center gap-2"
+              >
+
+                <p class="text-[13px] text-text">
+
+                  <span class="font-semibold">
+                    Telefone:
+                  </span>
+
+                  <span id="telefoneUsuario">
+                    (19) 99999-4444
+                  </span>
+
+                </p>
+
+
+                <button
+                  id="btnEditarTelefone"
+                  type="button"
+                  aria-label="Editar telefone"
+
+                  class="
+                    flex
+                    size-6
+                    cursor-pointer
+                    items-center
+                    justify-center
+                    text-primary-darker
+                    transition
+                    hover:scale-110
+                  "
+                >
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    class="size-[18px]"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm17.71-10.04a.996.996 0 0 0 0-1.41l-2.5-2.5a.996.996 0 0 0-1.41 0l-1.96 1.96 3.75 3.75 2.12-1.8Z"
+                    />
+                  </svg>
+
+                </button>
+
+              </div>
+
+
+              <!-- Edição -->
+              <div
+                id="edicaoTelefone"
+                class="hidden"
+              >
+
+                <input
+                  id="inputTelefoneUsuario"
+                  type="tel"
+                  required
+                  inputmode="numeric"
+                  maxlength="15"
+                  autocomplete="tel"
+                  placeholder="(19) 99999-9999"
+                  aria-describedby="erroTelefoneUsuario"
+
+                  class="
+                    h-[32px]
+                    w-full
+                    max-w-[220px]
+                    rounded-[4px]
+                    border
+                    border-border
+                    bg-white
+                    px-3
+                    text-[13px]
+                    text-text
+                    outline-none
+                    focus:border-primary
+                    aria-invalid:border-danger
+                  "
+                >
+
+
+                <p
+                  id="erroTelefoneUsuario"
+                  class="
+                    mt-1
+                    hidden
+                    text-[11px]
+                    text-danger
+                  "
+                ></p>
+
+
+                <div class="mt-2 flex gap-2">
+
+                  <button
+                    id="btnSalvarTelefone"
+                    type="button"
+
+                    class="
+                      rounded-[4px]
+                      bg-primary
+                      px-3
+                      py-1
+                      text-[11px]
+                      text-white
+                      transition
+                      hover:bg-primary-dark
+                    "
+                  >
+                    Salvar
+                  </button>
+
+
+                  <button
+                    id="btnCancelarTelefone"
+                    type="button"
+
+                    class="
+                      rounded-[4px]
+                      border
+                      border-border
+                      px-3
+                      py-1
+                      text-[11px]
+                      text-text
+                      transition
+                      hover:bg-white/60
+                    "
+                  >
+                    Cancelar
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+
+            <!-- ================================= -->
+            <!-- SENHA                             -->
+            <!-- ================================= -->
+
+            <div class="flex items-center gap-3">
+
+              <p class="text-[13px] text-text">
+
+                <span class="font-semibold">
+                  Senha:
+                </span>
+
+                <span>
+                  ********
+                </span>
+
+              </p>
+
+
+              <button
+                id="btnAlterarSenha"
+                type="button"
+
+                class="
+                  cursor-pointer
+                  text-[12px]
+                  text-primary-darker
+                  underline
+                  transition
+                  hover:text-primary
+                "
+              >
+                Alterar senha
+              </button>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- ================================= -->
+          <!-- FOTO                              -->
+          <!-- ================================= -->
+
+          <div
+            class="
+              flex
+              flex-col
+              items-center
+              justify-center
+            "
+          >
+
+            <!-- Foto -->
+            <div
+              class="
+                flex
+                size-[86px]
+                items-center
+                justify-center
+                overflow-hidden
+                rounded-full
+                bg-[#C3C3C3]
+              "
+            >
+
+              <span
+                id="fotoPlaceholder"
+
+                class="
+                  text-[16px]
+                  font-semibold
+                  text-text
+                "
+              >
+                foto?
+              </span>
+
+
+              <img
+                id="fotoUsuario"
+                src=""
+                alt="Foto do usuário"
+
+                class="
+                  hidden
+                  h-full
+                  w-full
+                  object-cover
+                "
+              >
+
+            </div>
+
+
+            <!-- Alterar foto -->
+            <button
+              id="btnAlterarFoto"
+              type="button"
+
+              class="
+                mt-2
+                flex
+                cursor-pointer
+                items-center
+                gap-1.5
+                text-[12px]
+                text-text-secondary
+                transition
+                hover:text-primary
+              "
+            >
+
+              <span>
+                Alterar foto
+              </span>
+
+
+              <svg
+                viewBox="0 0 24 24"
+
+                class="
+                  size-[16px]
+                  text-primary-darker
+                "
+
+                fill="currentColor"
+                aria-hidden="true"
+              >
+
+                <path
+                  d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm17.71-10.04a.996.996 0 0 0 0-1.41l-2.5-2.5a.996.996 0 0 0-1.41 0l-1.96 1.96 3.75 3.75 2.12-1.8Z"
+                />
+
+              </svg>
+
+            </button>
+
+
+            <input
+              id="inputFotoUsuario"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              class="hidden"
+            >
+
+
+            <p
+              id="erroFotoUsuario"
+
+              class="
+                mt-1
+                hidden
+                text-center
+                text-[10px]
+                text-danger
+              "
+            ></p>
+
+          </div>
+
+        </section>
+
+      </div>
+
+    </main>
+
+
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
+  </div>
+
+
+
+  <!-- ====================================== -->
+  <!-- MODAL - ALTERAR SENHA                  -->
+  <!-- ====================================== -->
+
+  <div
+    id="modalAlterarSenha"
+
+    class="
+      fixed
+      inset-0
+      z-50
+      hidden
+      items-center
+      justify-center
+      bg-black/40
+      p-4
+    "
+  >
+
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tituloAlterarSenha"
+
+      class="
+        w-full
+        max-w-[360px]
+        rounded-[8px]
+        bg-background
+        p-6
+        shadow-lg
+      "
+    >
+
+      <!-- Título do modal -->
+      <h2
+        id="tituloAlterarSenha"
+
+        class="
+          mb-5
+          text-[18px]
+          font-semibold
+          text-text
+        "
+      >
+        Alterar senha
+      </h2>
+
+
+
+      <!-- ================================= -->
+      <!-- NOVA SENHA                        -->
+      <!-- ================================= -->
+
+      <div class="mb-4">
+
+        <label
+          for="novaSenha"
+
+          class="
+            mb-1.5
+            block
+            text-[13px]
+            text-text
+          "
+        >
+          Nova senha
+        </label>
+
+
+        <div class="relative">
+
+          <input
+            id="novaSenha"
+            type="password"
+            autocomplete="new-password"
+            maxlength="50"
+            placeholder="Digite a nova senha"
+
+            class="
+              h-[36px]
+              w-full
+              rounded-[4px]
+              border
+              border-border
+              bg-white
+              px-3
+              pr-10
+              text-[13px]
+              text-text
+              outline-none
+              placeholder:text-text-secondary
+              focus:border-primary
+            "
+          >
+
+
+          <!-- Olho -->
+          <button
+            id="btnMostrarNovaSenha"
+            type="button"
+            aria-label="Mostrar senha"
+
+            class="
+              absolute
+              right-3
+              top-1/2
+              -translate-y-1/2
+              cursor-pointer
+              text-primary-darker
+            "
+          >
+
+            <svg
+              viewBox="0 0 24 24"
+              class="size-[18px]"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              aria-hidden="true"
+            >
+
+              <path
+                d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z"
+              />
+
+              <circle
+                cx="12"
+                cy="12"
+                r="2.8"
+              />
+
+            </svg>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ================================= -->
+      <!-- CONFIRMAR SENHA                   -->
+      <!-- ================================= -->
+
+      <div>
+
+        <label
+          for="confirmarNovaSenha"
+
+          class="
+            mb-1.5
+            block
+            text-[13px]
+            text-text
+          "
+        >
+          Confirmar nova senha
+        </label>
+
+
+        <div class="relative">
+
+          <input
+            id="confirmarNovaSenha"
+            type="password"
+            autocomplete="new-password"
+            maxlength="50"
+            placeholder="Digite novamente"
+
+            class="
+              h-[36px]
+              w-full
+              rounded-[4px]
+              border
+              border-border
+              bg-white
+              px-3
+              pr-10
+              text-[13px]
+              text-text
+              outline-none
+              placeholder:text-text-secondary
+              focus:border-primary
+            "
+          >
+
+
+          <!-- Olho -->
+          <button
+            id="btnMostrarConfirmacaoSenha"
+            type="button"
+            aria-label="Mostrar senha"
+
+            class="
+              absolute
+              right-3
+              top-1/2
+              -translate-y-1/2
+              cursor-pointer
+              text-primary-darker
+            "
+          >
+
+            <svg
+              viewBox="0 0 24 24"
+              class="size-[18px]"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              aria-hidden="true"
+            >
+
+              <path
+                d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z"
+              />
+
+              <circle
+                cx="12"
+                cy="12"
+                r="2.8"
+              />
+
+            </svg>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- Mensagem de erro -->
+      <p
+        id="erroSenhaUsuario"
+
+        class="
+          mt-1
+          hidden
+          text-[11px]
+          text-danger
+        "
+      ></p>
+
+
+
+      <!-- Botões -->
+      <div
+        class="
+          mt-5
+          flex
+          justify-end
+          gap-2
+        "
+      >
+
+        <button
+          id="btnCancelarSenha"
+          type="button"
+
+          class="
+            rounded-[5px]
+            border
+            border-border
+            px-4
+            py-2
+            text-[12px]
+            text-text
+            transition
+            hover:bg-white
+          "
+        >
+          Cancelar
+        </button>
+
+
+        <button
+          id="btnSalvarSenha"
+          type="button"
+
+          class="
+            rounded-[5px]
+            bg-primary
+            px-4
+            py-2
+            text-[12px]
+            text-white
+            transition
+            hover:bg-primary-dark
+          "
+        >
+          Salvar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ====================================== -->
+  <!-- JAVASCRIPT                             -->
+  <!-- ====================================== -->
+
+  <script src="../../public/js/load-partials.js"></script>
+  <script src="../../public/js/dados-do-usuario.js"></script>
+
+</body>
+
+</html>

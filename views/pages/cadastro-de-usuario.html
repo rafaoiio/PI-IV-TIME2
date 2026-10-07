@@ -18,13 +18,7 @@
 </head>
 
 
-<body
-  class="min-h-screen bg-[#202020] p-2 font-sans"
->
-
-  <!-- ========================================= -->
-  <!-- CONTAINER PRINCIPAL                       -->
-  <!-- ========================================= -->
+<body class="min-h-screen bg-[#202020] p-2 font-sans">
 
   <main
     class="
@@ -40,7 +34,7 @@
 
 
     <!-- ========================================= -->
-    <!-- LADO ESQUERDO                             -->
+    <!-- LADO ESQUERDO - FORMULÁRIO               -->
     <!-- ========================================= -->
 
     <section
@@ -49,8 +43,8 @@
         min-h-[calc(100vh-16px)]
         items-center
         justify-center
-        bg-[#D7DEE0]
-        px-8
+        bg-[#DDE2E4]
+        px-[12%]
         py-12
 
         lg:min-h-0
@@ -60,243 +54,524 @@
 
       <form
         id="formCadastro"
-        class="w-[64%] max-w-[420px]"
+        class="w-full max-w-[380px]"
         novalidate
       >
 
-        <!-- Nome completo -->
-        <div class="mb-5">
 
-          <label
-            for="nome"
-            class="mb-1.5 block text-label text-text"
-          >
-            Nome completo
-            <span class="text-danger">*</span>
-          </label>
+        <!-- ===================================== -->
+        <!-- ETAPA 1 - DADOS PESSOAIS             -->
+        <!-- ===================================== -->
 
-          <input
-            id="nome"
-            name="nome"
-            type="text"
+        <div id="etapaDados">
 
-            placeholder="Digite aqui"
-            autocomplete="name"
+          <div class="mb-8">
+            <h1 class="text-[26px] font-semibold text-text">
+              Cadastre-se
+            </h1>
+          </div>
 
-            required
-            minlength="3"
-            maxlength="100"
+
+          <!-- Nome completo -->
+          <div class="mb-5">
+
+            <label
+              for="nome"
+              class="mb-1.5 block text-label text-text"
+            >
+              Nome completo
+              <span class="text-danger">*</span>
+            </label>
+
+
+            <input
+              id="nome"
+              name="nome"
+              type="text"
+              required
+              minlength="3"
+              maxlength="100"
+              autocomplete="name"
+              placeholder="Digite aqui"
+              aria-describedby="erroNome"
+
+              class="
+                h-[32px]
+                w-full
+                rounded-[4px]
+                border
+                border-border
+                bg-[#E2E7E8]
+                px-3
+                text-[13px]
+                text-text
+                outline-none
+                placeholder:text-text-secondary
+                transition
+                focus:border-primary
+                aria-invalid:border-danger
+              "
+            >
+
+
+            <p
+              id="erroNome"
+              class="
+                mt-1
+                hidden
+                text-[11px]
+                text-danger
+              "
+            ></p>
+
+          </div>
+
+
+
+          <!-- E-mail -->
+          <div class="mb-5">
+
+            <label
+              for="email"
+              class="mb-1.5 block text-label text-text"
+            >
+              E-mail
+              <span class="text-danger">*</span>
+            </label>
+
+
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              maxlength="150"
+              autocomplete="email"
+              placeholder="Digite aqui"
+              aria-describedby="erroEmail"
+
+              class="
+                h-[32px]
+                w-full
+                rounded-[4px]
+                border
+                border-border
+                bg-[#E2E7E8]
+                px-3
+                text-[13px]
+                text-text
+                outline-none
+                placeholder:text-text-secondary
+                transition
+                focus:border-primary
+                aria-invalid:border-danger
+              "
+            >
+
+
+            <p
+              id="erroEmail"
+              class="
+                mt-1
+                hidden
+                text-[11px]
+                text-danger
+              "
+            ></p>
+
+          </div>
+
+
+
+          <!-- Celular / WhatsApp -->
+          <div class="mb-5">
+
+            <label
+              for="celular"
+              class="mb-1.5 block text-label text-text"
+            >
+              Celular / WhatsApp
+              <span class="text-danger">*</span>
+            </label>
+
+
+            <input
+              id="celular"
+              name="celular"
+              type="tel"
+              required
+              maxlength="19"
+              inputmode="numeric"
+              autocomplete="tel"
+              placeholder="+55 (19) 99999-9999"
+              aria-describedby="erroCelular"
+
+              class="
+                h-[32px]
+                w-full
+                rounded-[4px]
+                border
+                border-border
+                bg-[#E2E7E8]
+                px-3
+                text-[13px]
+                text-text
+                outline-none
+                placeholder:text-text-secondary
+                transition
+                focus:border-primary
+                aria-invalid:border-danger
+              "
+            >
+
+
+            <p
+              id="erroCelular"
+              class="
+                mt-1
+                hidden
+                text-[11px]
+                text-danger
+              "
+            ></p>
+
+          </div>
+
+
+
+          <!-- Botão Próximo -->
+          <button
+            id="btnProximo"
+            type="button"
 
             class="
-              h-[32px]
+              flex
+              h-[36px]
               w-full
-              rounded-[4px]
-              border
-              border-border
-              bg-[#E2E7E8]
-              px-3
-              text-[13px]
-              text-text
-              outline-none
-              placeholder:text-text-secondary
+              items-center
+              justify-center
+              rounded-[7px]
+              bg-[#174F54]
+              text-[18px]
+              font-normal
+              text-white
               transition
-              focus:border-primary
-              focus:ring-1
-              focus:ring-primary/20
+              hover:bg-[#123F43]
+              active:scale-[0.99]
             "
           >
+            Próximo
+          </button>
 
+
+
+          <!-- Termos -->
           <p
-            id="erroNome"
-            class="mt-1 hidden text-[11px] text-danger"
-          ></p>
+            class="
+              mx-auto
+              mt-2
+              max-w-[310px]
+              text-center
+              text-[9px]
+              leading-[13px]
+              text-text
+            "
+          >
+            Ao informar meus dados, eu concordo com a
+
+            <a
+              href="#"
+              class="underline hover:text-primary"
+            >
+              Política de Privacidade
+            </a>
+
+            e
+
+            <a
+              href="#"
+              class="underline hover:text-primary"
+            >
+              Termos de Uso
+            </a>
+
+            do PsicomManager
+          </p>
 
         </div>
 
 
 
-        <!-- E-mail -->
-        <div class="mb-5">
+        <!-- ===================================== -->
+        <!-- ETAPA 2 - SENHA                      -->
+        <!-- ===================================== -->
 
-          <label
-            for="email"
-            class="mb-1.5 block text-label text-text"
-          >
-            E-mail
-            <span class="text-danger">*</span>
-          </label>
-
-          <input
-            id="email"
-            name="email"
-            type="email"
-
-            placeholder="Digite aqui"
-            autocomplete="email"
-
-            required
-            maxlength="150"
-
-            class="
-              h-[32px]
-              w-full
-              rounded-[4px]
-              border
-              border-border
-              bg-[#E2E7E8]
-              px-3
-              text-[13px]
-              text-text
-              outline-none
-              placeholder:text-text-secondary
-              transition
-              focus:border-primary
-              focus:ring-1
-              focus:ring-primary/20
-            "
-          >
-
-          <p
-            id="erroEmail"
-            class="mt-1 hidden text-[11px] text-danger"
-          ></p>
-
-
-        </div>
-
-
-
-
-        <!-- Celular / WhatsApp -->
-        <div class="mb-5">
-
-          <label
-            for="celular"
-            class="mb-1.5 block text-label text-text"
-          >
-            Celular / WhatsApp
-            <span class="text-danger">*</span>
-          </label>
-
-          <input
-            id="celular"
-            name="celular"
-            type="tel"
-
-            placeholder="+55 (19) 99999-9999"
-            autocomplete="tel"
-
-            inputmode="numeric"
-
-            required
-            maxlength="19"
-
-            class="
-              h-[32px]
-              w-full
-              rounded-[4px]
-              border
-              border-border
-              bg-[#E2E7E8]
-              px-3
-              text-[13px]
-              text-text
-              outline-none
-              placeholder:text-text-secondary
-              transition
-              focus:border-primary
-              focus:ring-1
-              focus:ring-primary/20
-            "
-          >
-
-          <p
-            id="erroCelular"
-            class="mt-1 hidden text-[11px] text-danger"
-          ></p>
-
-        </div>
-
-
-
-        <!-- Botão de envio -->
-        <button
-          type="submit"
-
-          class="
-            flex
-            h-[36px]
-            w-full
-
-            items-center
-            justify-center
-
-            rounded-[7px]
-
-            bg-primary
-
-            text-[18px]
-            font-normal
-            text-white
-
-            transition
-
-            hover:bg-primary-dark
-
-            active:scale-[0.99]
-          "
+        <div
+          id="etapaSenha"
+          class="hidden"
         >
-          Próximo
-        </button>
+
+          <div class="mb-8">
+            <h1 class="text-[26px] font-semibold text-text">
+              Crie sua senha
+            </h1>
+          </div>   
+
+
+          <!-- Senha -->
+          <div class="mb-5">
+
+            <label
+              for="senha"
+              class="mb-1.5 block text-label text-text"
+            >
+              Senha
+              <span class="text-danger">*</span>
+            </label>
+
+
+            <div class="relative">
+
+              <input
+                id="senha"
+                name="senha"
+                type="password"
+                required
+                minlength="8"
+                maxlength="50"
+                autocomplete="new-password"
+                placeholder="Digite sua senha"
+                aria-describedby="erroSenha"
+
+                class="
+                  h-[32px]
+                  w-full
+                  rounded-[4px]
+                  border
+                  border-border
+                  bg-[#E2E7E8]
+                  px-3
+                  pr-10
+                  text-[13px]
+                  text-text
+                  outline-none
+                  placeholder:text-text-secondary
+                  transition
+                  focus:border-primary
+                  aria-invalid:border-danger
+                "
+              >
+
+
+              <!-- Mostrar / esconder senha -->
+              <button
+                id="btnMostrarSenha"
+                type="button"
+                aria-label="Mostrar senha"
+
+                class="
+                  absolute
+                  right-3
+                  top-1/2
+                  -translate-y-1/2
+                  cursor-pointer
+                  text-primary-darker
+                "
+              >
+
+                <svg
+                  viewBox="0 0 24 24"
+                  class="size-[18px]"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z"
+                  />
+
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="2.8"
+                  />
+                </svg>
+
+              </button>
+
+            </div>
+
+
+            <p
+              id="erroSenha"
+              class="
+                mt-1
+                hidden
+                text-[11px]
+                text-danger
+              "
+            ></p>
+
+
+            <p
+              class="
+                mt-1
+                text-[10px]
+                text-text-secondary
+              "
+            >
+              A senha deve possuir pelo menos 8 caracteres.
+            </p>
+
+          </div>
 
 
 
-        <!-- ================================= -->
-        <!-- TERMOS                            -->
-        <!-- ================================= -->
+          <!-- Confirmar senha -->
+          <div class="mb-5">
 
-        <p
-          class="
-            mx-auto
-            mt-2
+            <label
+              for="confirmarSenha"
+              class="mb-1.5 block text-label text-text"
+            >
+              Confirmar senha
+              <span class="text-danger">*</span>
+            </label>
 
-            max-w-[240px]
 
-            text-center
-            text-[9px]
-            leading-[13px]
+            <div class="relative">
 
-            text-text
-          "
-        >
+              <input
+                id="confirmarSenha"
+                name="confirmarSenha"
+                type="password"
+                required
+                minlength="8"
+                maxlength="50"
+                autocomplete="new-password"
+                placeholder="Digite novamente"
+                aria-describedby="erroConfirmarSenha"
 
-          Ao informar meus dados, eu concordo com a
+                class="
+                  h-[32px]
+                  w-full
+                  rounded-[4px]
+                  border
+                  border-border
+                  bg-[#E2E7E8]
+                  px-3
+                  pr-10
+                  text-[13px]
+                  text-text
+                  outline-none
+                  placeholder:text-text-secondary
+                  transition
+                  focus:border-primary
+                  aria-invalid:border-danger
+                "
+              >
 
-          <a
-            href="#"
-            class="
-              underline
-              hover:text-primary
-            "
-          >
-            Política de Privacidade
-          </a>
 
-          e
+              <!-- Mostrar / esconder confirmação -->
+              <button
+                id="btnMostrarConfirmacao"
+                type="button"
+                aria-label="Mostrar senha"
 
-          <a
-            href="#"
-            class="
-              underline
-              hover:text-primary
-            "
-          >
-            Termos de Uso
-          </a>
+                class="
+                  absolute
+                  right-3
+                  top-1/2
+                  -translate-y-1/2
+                  cursor-pointer
+                  text-primary-darker
+                "
+              >
 
-          do PsicomManager
+                <svg
+                  viewBox="0 0 24 24"
+                  class="size-[18px]"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z"
+                  />
 
-        </p>
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="2.8"
+                  />
+                </svg>
+
+              </button>
+
+            </div>
+
+
+            <p
+              id="erroConfirmarSenha"
+              class="
+                mt-1
+                hidden
+                text-[11px]
+                text-danger
+              "
+            ></p>
+
+          </div>
+
+
+
+          <!-- Botões -->
+          <div class="flex gap-3">
+
+            <button
+              id="btnVoltar"
+              type="button"
+
+              class="
+                h-[36px]
+                flex-1
+                rounded-[7px]
+                border
+                border-primary
+                text-[15px]
+                text-primary
+                transition
+                hover:bg-primary-light
+                active:scale-[0.99]
+              "
+            >
+              Voltar
+            </button>
+
+
+            <button
+              type="submit"
+
+              class="
+                h-[36px]
+                flex-[1]
+                rounded-[7px]
+                bg-[#174F54]
+                text-[16px]
+                text-white
+                transition
+                hover:bg-[#123F43]
+                active:scale-[0.99]
+              "
+            >
+              Cadastrar
+            </button>
+
+          </div>
+
+        </div>
 
       </form>
 
@@ -305,7 +580,7 @@
 
 
     <!-- ========================================= -->
-    <!-- LADO DIREITO                              -->
+    <!-- LADO DIREITO - IMAGEM                    -->
     <!-- ========================================= -->
 
     <section
@@ -314,30 +589,24 @@
         hidden
         min-h-0
         overflow-hidden
-
         lg:block
       "
     >
 
       <img
         src="../../public/images/cadastro-bg.jpeg"
-
-        alt="Profissional utilizando um tablet"
+        alt="Profissional utilizando um tablet em um estabelecimento"
 
         class="
           absolute
           inset-0
-
           h-full
           w-full
-
           object-cover
           object-[32%_center]
         "
       >
 
-
-      <!-- Escurecimento semelhante ao protótipo -->
 
       <div
         class="
@@ -350,16 +619,10 @@
 
     </section>
 
-
   </main>
 
 
-
-  <!-- ========================================= -->
-  <!-- JAVASCRIPT                                 -->
-  <!-- ========================================= -->
   <script src="../../public/js/cadastro-de-usuario.js"></script>
-
 
 </body>
 
