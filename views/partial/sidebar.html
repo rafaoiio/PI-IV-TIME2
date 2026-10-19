@@ -25,6 +25,19 @@
     </section>
 
     <section>
+      <button type="button" data-sidebar-toggle aria-expanded="false" aria-controls="sidebar-lotes" class="flex min-h-11 md:min-h-6 w-full cursor-pointer items-center gap-2 text-left uppercase">
+        <img src="/public/icons/lots.svg" alt="" width="24" height="24" class="size-6 shrink-0">
+        <span class="flex-1">Lotes</span>
+        <img src="/public/icons/chevron-down.svg" alt="" width="12" height="12" data-sidebar-chevron class="size-3 shrink-0 transition-transform">
+      </button>
+      <ul id="sidebar-lotes" class="mt-1 space-y-0.5 pl-5 text-[11px] font-normal hidden">
+        <li class="px-1.5 py-0.5"><a href="/views/pages/todos-lotes.html">• Todos os Lotes</a></li>
+        <li class="px-1.5 py-0.5"><a href="/views/pages/cadastro-lotes.html">• Cadastrar Lote</a></li>
+        <li class="px-1.5 py-0.5"><a href="/views/pages/proximos-vencimento.html">• Próx. vencimento</a></li>
+      </ul>
+    </section>
+
+    <section>
       <button type="button" data-sidebar-toggle aria-expanded="false" aria-controls="sidebar-desperdicio" class="flex min-h-11 md:min-h-6 w-full cursor-pointer items-center gap-2 text-left uppercase">
         <img src="/public/icons/waste.svg" alt="" width="24" height="24" class="size-6 shrink-0">
         <span class="flex-1">Desperdício</span>
