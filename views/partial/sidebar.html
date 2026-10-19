@@ -7,38 +7,38 @@
   </div>
 
   <nav id="sidebar-navigation" aria-label="Menu principal" class="hidden flex-col gap-5 px-3 py-4 text-xs font-semibold md:flex md:pt-7">
-    <a href="../pages/dashboard.html" class="flex min-h-11 md:min-h-6 items-center gap-2 uppercase hover:text-primary-light">
-      <img src="../../public/icons/home.svg" alt="" width="24" height="24" class="size-6 shrink-0">
+    <a href="/views/pages/dashboard.html" class="flex min-h-11 md:min-h-6 items-center gap-2 uppercase hover:text-primary-light">
+      <img src="/public/icons/home.svg" alt="" width="24" height="24" class="size-6 shrink-0">
       <span>Dashboard</span>
     </a>
 
     <section>
       <button type="button" data-sidebar-toggle aria-expanded="false" aria-controls="sidebar-produtos" class="flex min-h-11 md:min-h-6 w-full cursor-pointer items-center gap-2 text-left uppercase">
-        <img src="../../public/icons/products.svg" alt="" width="24" height="24" class="size-6 shrink-0">
+        <img src="/public/icons/products.svg" alt="" width="24" height="24" class="size-6 shrink-0">
         <span class="flex-1">Produtos</span>
-        <img src="../../public/icons/chevron-down.svg" alt="" width="12" height="12" data-sidebar-chevron class="size-3 shrink-0 transition-transform">
+        <img src="/public/icons/chevron-down.svg" alt="" width="12" height="12" data-sidebar-chevron class="size-3 shrink-0 transition-transform">
       </button>
       <ul id="sidebar-produtos" class="mt-1 space-y-0.5 pl-5 text-[11px] font-normal hidden">
-        <li class="rounded  px-1.5 py-0.5">• Todos os produtos</li>
-        <li class="px-1.5 py-0.5">• Próx. vencimento</li>
+        <li class="rounded  px-1.5 py-0.5"><a href="/views/pages/todos-produtos.html">• Todos os produtos</a></li>
+        <li class="px-1.5 py-0.5"><a href="/views/pages/proximos-vencimento.html">• Próx. vencimento</a></li>
       </ul>
     </section>
 
     <section>
       <button type="button" data-sidebar-toggle aria-expanded="false" aria-controls="sidebar-desperdicio" class="flex min-h-11 md:min-h-6 w-full cursor-pointer items-center gap-2 text-left uppercase">
-        <img src="../../public/icons/waste.svg" alt="" width="24" height="24" class="size-6 shrink-0">
+        <img src="/public/icons/waste.svg" alt="" width="24" height="24" class="size-6 shrink-0">
         <span class="flex-1">Desperdício</span>
-        <img src="../../public/icons/chevron-down.svg" alt="" width="12" height="12" data-sidebar-chevron class="size-3 shrink-0 transition-transform">
+        <img src="/public/icons/chevron-down.svg" alt="" width="12" height="12" data-sidebar-chevron class="size-3 shrink-0 transition-transform">
       </button>
       <ul id="sidebar-desperdicio" class="mt-1 space-y-0.5 pl-5 text-[11px] font-normal hidden">
-        <li class="px-1.5 py-0.5">• Histórico</li>
-        <li class="px-1.5 py-0.5">• Registrar</li>
+        <li class="px-1.5 py-0.5"><a href="/views/pages/historico-desperdicio.html">• Histórico</a></li>
+        <li class="px-1.5 py-0.5"><a href="/views/pages/registrar-desperdicio.html">• Registrar</a></li>
       </ul>
     </section>
 
-    <div class="flex min-h-11 md:min-h-6 items-center gap-2 uppercase">
-      <img src="../../public/icons/reports.svg" alt="" width="24" height="24" class="size-6 shrink-0">
+    <a href="/views/pages/relatorios.html" class="flex min-h-11 md:min-h-6 items-center gap-2 uppercase">
+      <img src="/public/icons/reports.svg" alt="" width="24" height="24" class="size-6 shrink-0">
       <span>Relatórios</span>
-    </div>
+    </a>
   </nav>
 </div>
