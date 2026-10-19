@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Registrar desperdício</title>
+  <title>Registrar Saída | Sistema de Gestão e Redução de Desperdício</title>
 
   <link rel="stylesheet" href="/public/css/style.css">
 </head>
@@ -30,7 +30,7 @@
           class="mb-8 flex min-h-[35px] items-center text-base"
         >
           <span class="text-text-secondary">
-            Desperdício
+            Saídas
           </span>
 
           <span class="ml-1 font-semibold text-text">
@@ -47,7 +47,7 @@
           <h1
             class="mb-9 text-base font-semibold text-text"
           >
-            Registrar Desperdício
+            Registrar Saída
           </h1>
 
 
@@ -104,20 +104,20 @@
               </div>
 
 
-              <!-- Quantidade desperdiçada -->
+              <!-- Quantidade de saída -->
               <div class="flex flex-col">
 
                 <label
-                  for="quantidade-desperdicada"
+                  for="quantidade-saida"
                   class="mb-2 whitespace-nowrap text-xs font-medium text-text"
                 >
-                  Qtd. desperdiçada
+                  Qtd. de saída
                   <span class="text-red-600">*</span>
                 </label>
 
                 <input
-                  id="quantidade-desperdicada"
-                  name="quantidade-desperdicada"
+                  id="quantidade-saida"
+                  name="quantidade-saida"
                   type="text"
                   placeholder="ex. 5"
                   required
@@ -127,22 +127,21 @@
               </div>
 
 
-              <!-- Data -->
+              <!-- Data da saída -->
               <div class="flex flex-col">
 
                 <label
-                  for="data-vencimento"
+                  for="data-saida"
                   class="mb-2 whitespace-nowrap text-xs font-medium text-text"
                 >
-                  Data Vencimento
+                  Data da saída
                   <span class="text-red-600">*</span>
                 </label>
 
                 <input
-                  id="data-vencimento"
-                  name="data-vencimento"
-                  type="text"
-                  placeholder="ex. 29/09/2027"
+                  id="data-saida"
+                  name="data-saida"
+                  type="date"
                   required
                   class="h-[28px] w-full rounded border border-gray-400 bg-primary-light px-3 text-[10px] text-text outline-none"
                 >
@@ -171,6 +170,10 @@
               >
                 <option value="" selected>
                   Selecione
+                </option>
+
+                <option value="consumido">
+                  Consumido
                 </option>
 
                 <option value="vencimento">
@@ -232,7 +235,7 @@
                 type="submit"
                 class="flex h-[28px] w-[108px] cursor-pointer items-center justify-center rounded bg-gray-200 text-[9px] font-medium text-text"
               >
-                Registrar Desperdício
+                Registrar Saída
               </button>
 
             </div>
