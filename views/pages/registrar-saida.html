@@ -53,9 +53,9 @@
 
           <form>
 
-            <!-- Primeira linha -->
+            <!-- Produto e lote -->
             <div
-              class="grid grid-cols-[2.2fr_1fr_1fr_1.8fr] gap-8"
+              class="grid grid-cols-1 gap-8 md:grid-cols-2"
             >
 
               <!-- Produto -->
@@ -69,17 +69,53 @@
                   <span class="text-red-600">*</span>
                 </label>
 
-                <input
+                <select
                   id="produto"
                   name="produto"
-                  type="text"
-                  placeholder="Digite aqui"
                   required
                   class="h-[28px] w-full rounded border border-gray-400 bg-primary-light px-3 text-[11px] text-text outline-none"
                 >
+                  <option value="" selected disabled>
+                    Selecione um produto cadastrado
+                  </option>
+
+                  <!-- Produtos serão carregados do banco de dados -->
+                </select>
 
               </div>
 
+
+              <!-- Lote -->
+              <div class="flex flex-col">
+
+                <label
+                  for="lote"
+                  class="mb-2 whitespace-nowrap text-xs font-medium text-text"
+                >
+                  Lote
+                  <span class="text-red-600">*</span>
+                </label>
+
+                <select
+                  id="lote"
+                  name="lote"
+                  required
+                  class="h-[28px] w-full rounded border border-gray-400 bg-primary-light px-3 text-[11px] text-text outline-none"
+                >
+                  <option value="" selected disabled>
+                    Selecione um lote disponível
+                  </option>
+
+                  <!-- Lotes com saldo do produto selecionado serão carregados do banco de dados -->
+                </select>
+
+              </div>
+
+            </div>
+
+
+            <!-- Quantidades e data da saída -->
+            <div class="mt-6 grid grid-cols-1 gap-8 md:grid-cols-3">
 
               <!-- Quantidade disponível -->
               <div class="flex flex-col">
