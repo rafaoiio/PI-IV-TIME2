@@ -58,6 +58,30 @@ public class Main {
                 new UsuariosHandler(usuarios)
             );
 
+            // Colecao de produtos
+            MongoCollection<Document> produtos =
+                banco.getCollection("itens");
+
+            // Colecao de categorias
+            MongoCollection<Document> categorias =
+                banco.getCollection("categorias");
+
+            // Handler compartilhado dos produtos e categorias
+            ProdutosHandler produtosHandler =
+                new ProdutosHandler(produtos, categorias);
+
+            // Rota de cadastro dos produtos
+            servidor.createContext(
+                "/api/produtos",
+                produtosHandler
+            );
+
+            // Rota de consulta das categorias
+            servidor.createContext(
+                "/api/categorias",
+                produtosHandler
+            );
+
             // Fecha recursos quando o servidor parar
             Runtime.getRuntime().addShutdownHook(
                 new Thread(() -> {
