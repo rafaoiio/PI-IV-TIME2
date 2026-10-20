@@ -42,67 +42,49 @@
 					</h1>
 
 					<!-- FORMULÁRIO -->
-					<form class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
+					<form id="formCadastroProduto" class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
 
 						<!-- NOME DO PRODUTO -->
 						<div class="flex flex-col">
 
-							<label for="nomeProduto"
-								class="mb-2 text-xs font-medium text-text">
+							<label for="nomeProduto" class="mb-2 text-xs font-medium text-text">
 								Nome do produto
 								<span class="text-red-600">*</span>
 							</label>
 
-							<input
-								type="text"
-								id="nomeProduto"
-								name="nomeProduto"
-								placeholder="Ex.: Leite Integral 1L"
+							<input type="text" id="nomeProduto" name="nomeProduto" placeholder="Ex.: Leite Integral 1L"
 								required
-								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"
-							>
+								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
 						</div>
 
 						<!-- CATEGORIA -->
 						<div class="flex flex-col">
 
-							<label for="categoria"
-								class="mb-2 text-xs font-medium text-text">
+							<label for="categoria" class="mb-2 text-xs font-medium text-text">
 								Categoria
 								<span class="text-red-600">*</span>
 							</label>
 
-							<select
-								id="categoria"
-								name="categoria"
+							<input type="text" id="categoria" name="categoria" list="listaCategorias"
+								placeholder="Digite ou selecione uma categoria" autocomplete="off" maxlength="100"
 								required
-								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"
-							>
-								<option value="">
-									Selecione a categoria
-								</option>
-								<option value="laticinios">Laticínios</option>
-								<option value="verduras-legumes">Verduras e Legumes</option>
-								<option value="bebidas">Bebidas não alcoólicas</option>
-								<option value="outro">Outro</option>
-							</select>
+								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
+
+							<!-- Categorias carregadas do MongoDB -->
+							<datalist id="listaCategorias"></datalist>
+
 						</div>
 
 						<!-- UNIDADE DE MEDIDA -->
 						<div class="flex flex-col">
 
-							<label for="unidadeMedida"
-								class="mb-2 text-xs font-medium text-text">
+							<label for="unidadeMedida" class="mb-2 text-xs font-medium text-text">
 								Unidade de Medida
 								<span class="text-red-600">*</span>
 							</label>
 
-							<select
-								id="unidadeMedida"
-								name="unidadeMedida"
-								required
-								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"
-							>
+							<select id="unidadeMedida" name="unidadeMedida" required
+								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
 								<option value="">
 									Selecione a Unidade
 								</option>
@@ -117,18 +99,13 @@
 						<!-- STATUS -->
 						<div class="flex flex-col">
 
-							<label for="status"
-								class="mb-2 text-xs font-medium text-text">
+							<label for="status" class="mb-2 text-xs font-medium text-text">
 								Status
 								<span class="text-red-600">*</span>
 							</label>
 
-							<select
-								id="status"
-								name="status"
-								required
-								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"
-							>
+							<select id="status" name="status" required
+								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
 								<option value="ativo">Ativo</option>
 								<option value="inativo">Inativo</option>
 							</select>
@@ -137,35 +114,26 @@
 						<!-- OBSERVAÇÃO -->
 						<div class="mt-4 flex flex-col md:col-span-2">
 
-							<label for="observacao"
-								class="mb-2 text-xs font-medium text-text">
+							<label for="observacao" class="mb-2 text-xs font-medium text-text">
 								Observação
 								<span class="text-red-600">*</span>
 							</label>
 
-							<textarea
-								id="observacao"
-								name="observacao"
-								placeholder="Informações adicionais do produto"
+							<textarea id="observacao" name="observacao" placeholder="Informações adicionais do produto"
 								required
-								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"
-							></textarea>
+								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"></textarea>
 						</div>
 
 						<!-- BOTÕES -->
 						<div class="mt-7 flex justify-end gap-3 md:col-span-2">
 
-							<button
-								type="button"
-								class="flex h-[28px] w-[92px] cursor-pointer items-center justify-center rounded bg-primary-dark text-[10px] font-semibold text-white"
-							>
+							<button type="button"
+								class="flex h-[28px] w-[92px] cursor-pointer items-center justify-center rounded bg-primary-dark text-[10px] font-semibold text-white">
 								Cancelar
 							</button>
 
-							<button
-								type="submit"
-								class="flex h-[28px] w-[150px] cursor-pointer items-center justify-center rounded bg-gray-200 text-[10px] font-medium text-text"
-							>
+							<button type="submit"
+								class="flex h-[28px] w-[150px] cursor-pointer items-center justify-center rounded bg-gray-200 text-[10px] font-medium text-text">
 								Cadastrar novo produto
 							</button>
 
@@ -183,6 +151,7 @@
 	</div>
 
 	<script src="../../public/js/load-partials.js"></script>
+	<script src="../../public/js/cadastro-produtos.js"></script>
 </body>
 
 </html>
