@@ -1,11 +1,3 @@
-/* =========================================
-   ELEMENTOS DO FORMULÁRIO
-
-
-/* =========================================
-   FUNÇÕES DE ERRO
-========================================= */
-
 function mostrarErro(
   input,
   elementoErro,
@@ -49,10 +41,6 @@ function removerErro(
 
 }
 
-
-/* =========================================
-   VALIDAÇÃO DO NOME
-========================================= */
 
 function validarNome() {
 
@@ -123,10 +111,6 @@ function validarNome() {
 }
 
 
-/* =========================================
-   VALIDAÇÃO DO E-MAIL
-========================================= */
-
 function validarEmail() {
 
   const email =
@@ -173,10 +157,6 @@ function validarEmail() {
 
 }
 
-
-/* =========================================
-   MÁSCARA DO CELULAR
-========================================= */
 
 celularInput.addEventListener(
   "input",
@@ -300,10 +280,6 @@ function aplicarMascaraCelular(valor) {
 }
 
 
-/* =========================================
-   VALIDAÇÃO DO CELULAR
-========================================= */
-
 function validarCelular() {
 
   const numeros =
@@ -351,10 +327,6 @@ function validarCelular() {
 }
 
 
-/* =========================================
-   VALIDAÇÃO DA SENHA
-========================================= */
-
 nomeInput.addEventListener(
   "blur",
   validarNome
@@ -384,10 +356,6 @@ confirmarSenhaInput.addEventListener(
   validarConfirmacaoSenha
 );
 
-
-/* =========================================
-   VALIDA NOVAMENTE ENQUANTO CORRIGE
-========================================= */
 
 formCadastro.addEventListener(
   "submit",
