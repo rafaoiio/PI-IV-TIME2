@@ -17,7 +17,6 @@
   >
 </head>
 
-
 <body class="min-h-screen bg-[#202020] p-2 font-sans">
 
   <main
@@ -27,12 +26,11 @@
       grid-cols-1
       overflow-hidden
       bg-background
-
       lg:grid-cols-[36%_64%]
     "
   >
 
-
+    <!-- Lado esquerdo: cadastro -->
     <section
       class="
         flex
@@ -42,7 +40,6 @@
         bg-[#DDE2E4]
         px-[12%]
         py-12
-
         lg:min-h-0
         lg:rounded-r-[24px]
       "
@@ -54,7 +51,7 @@
         novalidate
       >
 
-
+        <!-- Primeira etapa -->
         <div id="etapaDados">
 
           <div class="mb-8">
@@ -62,7 +59,6 @@
               Cadastre-se
             </h1>
           </div>
-
 
           <!-- Nome completo -->
           <div class="mb-5">
@@ -74,7 +70,6 @@
               Nome completo
               <span class="text-danger">*</span>
             </label>
-
 
             <input
               id="nome"
@@ -88,37 +83,21 @@
               aria-describedby="erroNome"
 
               class="
-                h-[32px]
-                w-full
-                rounded-[4px]
-                border
-                border-border
-                bg-[#E2E7E8]
-                px-3
-                text-[13px]
-                text-text
-                outline-none
-                placeholder:text-text-secondary
-                transition
-                focus:border-primary
+                h-[32px] w-full rounded-[4px]
+                border border-border bg-[#E2E7E8]
+                px-3 text-[13px] text-text
+                outline-none placeholder:text-text-secondary
+                transition focus:border-primary
                 aria-invalid:border-danger
               "
             >
 
-
             <p
               id="erroNome"
-              class="
-                mt-1
-                hidden
-                text-[11px]
-                text-danger
-              "
+              class="mt-1 hidden text-[11px] text-danger"
             ></p>
 
           </div>
-
-
 
           <!-- E-mail -->
           <div class="mb-5">
@@ -131,7 +110,6 @@
               <span class="text-danger">*</span>
             </label>
 
-
             <input
               id="email"
               name="email"
@@ -143,37 +121,21 @@
               aria-describedby="erroEmail"
 
               class="
-                h-[32px]
-                w-full
-                rounded-[4px]
-                border
-                border-border
-                bg-[#E2E7E8]
-                px-3
-                text-[13px]
-                text-text
-                outline-none
-                placeholder:text-text-secondary
-                transition
-                focus:border-primary
+                h-[32px] w-full rounded-[4px]
+                border border-border bg-[#E2E7E8]
+                px-3 text-[13px] text-text
+                outline-none placeholder:text-text-secondary
+                transition focus:border-primary
                 aria-invalid:border-danger
               "
             >
 
-
             <p
               id="erroEmail"
-              class="
-                mt-1
-                hidden
-                text-[11px]
-                text-danger
-              "
+              class="mt-1 hidden text-[11px] text-danger"
             ></p>
 
           </div>
-
-
 
           <!-- Celular / WhatsApp -->
           <div class="mb-5">
@@ -185,7 +147,6 @@
               Celular / WhatsApp
               <span class="text-danger">*</span>
             </label>
-
 
             <input
               id="celular"
@@ -199,37 +160,21 @@
               aria-describedby="erroCelular"
 
               class="
-                h-[32px]
-                w-full
-                rounded-[4px]
-                border
-                border-border
-                bg-[#E2E7E8]
-                px-3
-                text-[13px]
-                text-text
-                outline-none
-                placeholder:text-text-secondary
-                transition
-                focus:border-primary
+                h-[32px] w-full rounded-[4px]
+                border border-border bg-[#E2E7E8]
+                px-3 text-[13px] text-text
+                outline-none placeholder:text-text-secondary
+                transition focus:border-primary
                 aria-invalid:border-danger
               "
             >
 
-
             <p
               id="erroCelular"
-              class="
-                mt-1
-                hidden
-                text-[11px]
-                text-danger
-              "
+              class="mt-1 hidden text-[11px] text-danger"
             ></p>
 
           </div>
-
-
 
           <!-- Botão Próximo -->
           <button
@@ -237,36 +182,23 @@
             type="button"
 
             class="
-              flex
-              h-[36px]
-              w-full
-              items-center
-              justify-center
-              rounded-[7px]
-              bg-[#174F54]
-              text-[18px]
-              font-normal
-              text-white
-              transition
-              hover:bg-[#123F43]
+              flex h-[36px] w-full
+              items-center justify-center
+              rounded-[7px] bg-[#174F54]
+              text-[18px] font-normal text-white
+              transition hover:bg-[#123F43]
               active:scale-[0.99]
             "
           >
             Próximo
           </button>
 
-
-
           <!-- Termos -->
           <p
             class="
-              mx-auto
-              mt-2
-              max-w-[310px]
-              text-center
-              text-[9px]
-              leading-[13px]
-              text-text
+              mx-auto mt-2 max-w-[310px]
+              text-center text-[9px]
+              leading-[13px] text-text
             "
           >
             Ao informar meus dados, eu concordo com a
@@ -293,17 +225,14 @@
         </div>
 
 
-        <div
-          id="etapaSenha"
-          class="hidden"
-        >
+        <!-- Segunda etapa -->
+        <div id="etapaSenha" class="hidden">
 
           <div class="mb-8">
             <h1 class="text-[26px] font-semibold text-text">
               Crie sua senha
             </h1>
-          </div>   
-
+          </div>
 
           <!-- Senha -->
           <div class="mb-5">
@@ -315,7 +244,6 @@
               Senha
               <span class="text-danger">*</span>
             </label>
-
 
             <div class="relative">
 
@@ -331,41 +259,27 @@
                 aria-describedby="erroSenha"
 
                 class="
-                  h-[32px]
-                  w-full
-                  rounded-[4px]
-                  border
-                  border-border
-                  bg-[#E2E7E8]
-                  px-3
-                  pr-10
-                  text-[13px]
-                  text-text
-                  outline-none
-                  placeholder:text-text-secondary
-                  transition
-                  focus:border-primary
+                  h-[32px] w-full rounded-[4px]
+                  border border-border bg-[#E2E7E8]
+                  px-3 pr-10 text-[13px] text-text
+                  outline-none placeholder:text-text-secondary
+                  transition focus:border-primary
                   aria-invalid:border-danger
                 "
               >
 
-
-              <!-- Mostrar / esconder senha -->
               <button
                 id="btnMostrarSenha"
                 type="button"
                 aria-label="Mostrar senha"
+                aria-pressed="false"
 
                 class="
-                  absolute
-                  right-3
-                  top-1/2
-                  -translate-y-1/2
-                  cursor-pointer
+                  absolute right-3 top-1/2
+                  -translate-y-1/2 cursor-pointer
                   text-primary-darker
                 "
               >
-
                 <svg
                   viewBox="0 0 24 24"
                   class="size-[18px]"
@@ -377,33 +291,18 @@
                   <path
                     d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z"
                   />
-
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="2.8"
-                  />
+                  <circle cx="12" cy="12" r="2.8" />
                 </svg>
-
               </button>
 
             </div>
 
-
             <p
               id="erroSenha"
-              class="
-                mt-1
-                hidden
-                text-[11px]
-                text-danger
-              "
+              class="mt-1 hidden text-[11px] text-danger"
             ></p>
 
-
           </div>
-
-
 
           <!-- Confirmar senha -->
           <div class="mb-5">
@@ -415,7 +314,6 @@
               Confirmar senha
               <span class="text-danger">*</span>
             </label>
-
 
             <div class="relative">
 
@@ -431,41 +329,27 @@
                 aria-describedby="erroConfirmarSenha"
 
                 class="
-                  h-[32px]
-                  w-full
-                  rounded-[4px]
-                  border
-                  border-border
-                  bg-[#E2E7E8]
-                  px-3
-                  pr-10
-                  text-[13px]
-                  text-text
-                  outline-none
-                  placeholder:text-text-secondary
-                  transition
-                  focus:border-primary
+                  h-[32px] w-full rounded-[4px]
+                  border border-border bg-[#E2E7E8]
+                  px-3 pr-10 text-[13px] text-text
+                  outline-none placeholder:text-text-secondary
+                  transition focus:border-primary
                   aria-invalid:border-danger
                 "
               >
 
-
-              <!-- Mostrar / esconder confirmação -->
               <button
                 id="btnMostrarConfirmacao"
                 type="button"
                 aria-label="Mostrar senha"
+                aria-pressed="false"
 
                 class="
-                  absolute
-                  right-3
-                  top-1/2
-                  -translate-y-1/2
-                  cursor-pointer
+                  absolute right-3 top-1/2
+                  -translate-y-1/2 cursor-pointer
                   text-primary-darker
                 "
               >
-
                 <svg
                   viewBox="0 0 24 24"
                   class="size-[18px]"
@@ -477,32 +361,18 @@
                   <path
                     d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z"
                   />
-
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="2.8"
-                  />
+                  <circle cx="12" cy="12" r="2.8" />
                 </svg>
-
               </button>
 
             </div>
 
-
             <p
               id="erroConfirmarSenha"
-              class="
-                mt-1
-                hidden
-                text-[11px]
-                text-danger
-              "
+              class="mt-1 hidden text-[11px] text-danger"
             ></p>
 
           </div>
-
-
 
           <!-- Botões -->
           <div class="flex gap-3">
@@ -512,35 +382,26 @@
               type="button"
 
               class="
-                h-[36px]
-                flex-1
-                rounded-[7px]
-                border
-                border-primary
-                text-[15px]
-                text-primary
-                transition
-                hover:bg-primary-light
+                h-[36px] flex-1 rounded-[7px]
+                border border-primary
+                text-[15px] text-primary
+                transition hover:bg-primary-light
                 active:scale-[0.99]
               "
             >
               Voltar
             </button>
 
-
             <button
+              id="btnCadastrar"
               type="submit"
 
               class="
-                h-[36px]
-                flex-[1]
-                rounded-[7px]
-                bg-[#174F54]
-                text-[16px]
-                text-white
-                transition
-                hover:bg-[#123F43]
+                h-[36px] flex-1 rounded-[7px]
+                bg-[#174F54] text-[16px] text-white
+                transition hover:bg-[#123F43]
                 active:scale-[0.99]
+                disabled:cursor-wait disabled:opacity-70
               "
             >
               Cadastrar
@@ -548,20 +409,27 @@
 
           </div>
 
+          <!-- Mensagens gerais de erro da API -->
+          <p
+            id="mensagemCadastro"
+            role="alert"
+            class="
+              mt-3 hidden text-center
+              text-[12px] text-danger
+            "
+          ></p>
+
         </div>
 
       </form>
-
     </section>
 
 
+    <!-- Lado direito: imagem -->
     <section
       class="
-        relative
-        hidden
-        min-h-0
-        overflow-hidden
-        lg:block
+        relative hidden min-h-0
+        overflow-hidden lg:block
       "
     >
 
@@ -570,22 +438,15 @@
         alt="Profissional utilizando um tablet em um estabelecimento"
 
         class="
-          absolute
-          inset-0
-          h-full
-          w-full
-          object-cover
-          object-[32%_center]
+          absolute inset-0 h-full w-full
+          object-cover object-[32%_center]
         "
       >
 
-
       <div
         class="
-          pointer-events-none
-          absolute
-          inset-0
-          bg-black/10
+          pointer-events-none absolute
+          inset-0 bg-black/10
         "
       ></div>
 
@@ -594,8 +455,84 @@
   </main>
 
 
+  <!-- Modal de sucesso -->
+  <!-- Fora do main para ocupar a tela inteira -->
+
+  <div
+    id="modalSucesso"
+
+    class="
+      fixed inset-0 z-[9999]
+      hidden items-center justify-center
+      bg-black/50 p-5
+      backdrop-blur-[4px]
+    "
+
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="tituloModalSucesso"
+    aria-describedby="descricaoModalSucesso"
+    tabindex="-1"
+  >
+
+    <!-- Caixa central -->
+    <div
+      id="caixaModalSucesso"
+
+      class="
+        flex w-full max-w-[360px]
+        translate-y-3 scale-95
+        flex-col items-center gap-[14px]
+        rounded-2xl bg-[#DDE2E4]
+        px-7 py-8 text-center
+        opacity-0 shadow-2xl
+        transition-all duration-300 ease-out
+      "
+    >
+
+      <!-- Ícone de sucesso -->
+      <div
+        class="
+          flex size-12 items-center justify-center
+          rounded-full bg-[#174F54]
+          text-[26px] font-bold text-white
+        "
+        aria-hidden="true"
+      >
+        ✓
+      </div>
+
+      <!-- Título -->
+      <h2
+        id="tituloModalSucesso"
+        class="text-[20px] font-semibold text-[#174F54]"
+      >
+        Cadastro realizado!
+      </h2>
+
+
+      <!-- Spinner -->
+      <div
+        class="
+          mt-1 size-7 animate-spin
+          rounded-full border-[3px]
+          border-[#B8CECB]
+          border-t-[#174F54]
+        "
+        aria-hidden="true"
+      ></div>
+
+      <!-- Redirecionamento -->
+      <p class="text-[12px] text-[#174F54]">
+        Redirecionando para o login...
+      </p>
+
+    </div>
+
+  </div>
+
+
   <script src="../../public/js/cadastro-de-usuario.js"></script>
 
 </body>
-
 </html>
