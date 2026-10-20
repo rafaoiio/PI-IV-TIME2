@@ -1,6 +1,8 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
+  // Elementos da tela
+
   const formCadastro =
     document.getElementById("formCadastro");
 
@@ -9,9 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const etapaSenha =
     document.getElementById("etapaSenha");
-
-
-  // Campos
 
   const nomeInput =
     document.getElementById("nome");
@@ -28,9 +27,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const confirmarSenhaInput =
     document.getElementById("confirmarSenha");
 
-
-  // Mensagens de erro
-
   const erroNome =
     document.getElementById("erroNome");
 
@@ -46,9 +42,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const erroConfirmarSenha =
     document.getElementById("erroConfirmarSenha");
 
-
-  // Botões
-
   const btnProximo =
     document.getElementById("btnProximo");
 
@@ -61,18 +54,30 @@ document.addEventListener("DOMContentLoaded", function () {
   const btnMostrarConfirmacao =
     document.getElementById("btnMostrarConfirmacao");
 
+  const btnCadastrar =
+    document.getElementById("btnCadastrar");
+
+  const mensagemCadastro =
+    document.getElementById("mensagemCadastro");
+
+  const modalSucesso =
+    document.getElementById("modalSucesso");
+
+  const caixaModalSucesso =
+    document.getElementById("caixaModalSucesso");
+
+  const API_URL =
+    "http://localhost:8080/api/usuarios";
 
   let etapaAtual = 1;
+  let enviandoCadastro = false;
 
 
-  function mostrarErro(
-    input,
-    elementoErro,
-    mensagem
-  ) {
+  // Mensagens de erro
+
+  function mostrarErro(input, elementoErro, mensagem) {
 
     elementoErro.textContent = mensagem;
-
     elementoErro.classList.remove("hidden");
 
     input.setAttribute(
@@ -83,13 +88,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  function removerErro(
-    input,
-    elementoErro
-  ) {
+  function removerErro(input, elementoErro) {
 
     elementoErro.textContent = "";
-
     elementoErro.classList.add("hidden");
 
     input.removeAttribute("aria-invalid");
@@ -97,16 +98,29 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
+  function mostrarErroCadastro(mensagem) {
+
+    mensagemCadastro.textContent = mensagem;
+    mensagemCadastro.classList.remove("hidden");
+
+  }
+
+
+  function limparErroCadastro() {
+
+    mensagemCadastro.textContent = "";
+    mensagemCadastro.classList.add("hidden");
+
+  }
+
+
   function validarNome() {
 
-    const nome =
-      nomeInput.value.trim();
+    const nome = nomeInput.value.trim();
 
-    const partesNome =
-      nome
-        .split(/\s+/)
-        .filter(parte => parte.length > 0);
-
+    const partes = nome
+      .split(/\s+/)
+      .filter(Boolean);
 
     if (nome === "") {
 
@@ -117,11 +131,12 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       return false;
-
     }
 
-
-    if (nome.length < nomeInput.minLength) {
+    if (
+      nome.length < nomeInput.minLength ||
+      nome.length > nomeInput.maxLength
+    ) {
 
       mostrarErro(
         nomeInput,
@@ -130,11 +145,9 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       return false;
-
     }
 
-
-    if (partesNome.length < 2) {
+    if (partes.length < 2) {
 
       mostrarErro(
         nomeInput,
@@ -143,15 +156,9 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       return false;
-
     }
 
-
-    removerErro(
-      nomeInput,
-      erroNome
-    );
-
+    removerErro(nomeInput, erroNome);
     return true;
 
   }
@@ -159,9 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function validarEmail() {
 
-    const email =
-      emailInput.value.trim();
-
+    const email = emailInput.value.trim();
 
     if (email === "") {
 
@@ -172,11 +177,12 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       return false;
-
     }
 
-
-    if (emailInput.validity.typeMismatch) {
+    if (
+      emailInput.validity.typeMismatch ||
+      email.length > emailInput.maxLength
+    ) {
 
       mostrarErro(
         emailInput,
@@ -185,15 +191,9 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       return false;
-
     }
 
-
-    removerErro(
-      emailInput,
-      erroEmail
-    );
-
+    removerErro(emailInput, erroEmail);
     return true;
 
   }
@@ -201,15 +201,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function obterNumerosCelular(valor) {
 
-    const texto =
-      String(valor).trim();
+    const texto = String(valor).trim();
 
     let numeros =
       texto.replace(/\D/g, "");
-
-
-    // Remove o código do Brasil (+55)
-    // quando ele já estiver presente.
 
     if (
       texto.startsWith("+55") ||
@@ -219,11 +214,9 @@ document.addEventListener("DOMContentLoaded", function () {
       )
     ) {
 
-      numeros =
-        numeros.substring(2);
+      numeros = numeros.substring(2);
 
     }
-
 
     return numeros.substring(0, 11);
 
@@ -235,40 +228,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const numeros =
       obterNumerosCelular(valor);
 
-
-    if (numeros.length === 0) {
-
-      return "";
-
-    }
-
+    if (!numeros) return "";
 
     let resultado =
       "+55 (" + numeros.substring(0, 2);
 
-
     if (numeros.length >= 2) {
-
       resultado += ")";
-
     }
-
 
     if (numeros.length > 2) {
-
-      resultado +=
-        " " + numeros.substring(2, 7);
-
+      resultado += " " + numeros.substring(2, 7);
     }
-
 
     if (numeros.length > 7) {
-
-      resultado +=
-        "-" + numeros.substring(7, 11);
-
+      resultado += "-" + numeros.substring(7, 11);
     }
-
 
     return resultado;
 
@@ -278,10 +253,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function validarCelular() {
 
     const numeros =
-      obterNumerosCelular(
-        celularInput.value
-      );
-
+      obterNumerosCelular(celularInput.value);
 
     if (numeros.length === 0) {
 
@@ -292,9 +264,7 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       return false;
-
     }
-
 
     if (numeros.length !== 11) {
 
@@ -305,15 +275,9 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       return false;
-
     }
 
-
-    removerErro(
-      celularInput,
-      erroCelular
-    );
-
+    removerErro(celularInput, erroCelular);
     return true;
 
   }
@@ -321,9 +285,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function validarSenha() {
 
-    const senha =
-      senhaInput.value;
-
+    const senha = senhaInput.value;
 
     if (senha === "") {
 
@@ -334,28 +296,36 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       return false;
-
     }
 
-
-    if (senha.length < senhaInput.minLength) {
+    if (
+      senha.length < 8 ||
+      senha.length > 50
+    ) {
 
       mostrarErro(
         senhaInput,
         erroSenha,
-        "A senha deve ter pelo menos 8 caracteres."
+        "A senha deve ter entre 8 e 50 caracteres."
       );
 
       return false;
-
     }
 
+    if (
+      new TextEncoder().encode(senha).length > 72
+    ) {
 
-    removerErro(
-      senhaInput,
-      erroSenha
-    );
+      mostrarErro(
+        senhaInput,
+        erroSenha,
+        "A senha não pode ultrapassar 72 bytes."
+      );
 
+      return false;
+    }
+
+    removerErro(senhaInput, erroSenha);
     return true;
 
   }
@@ -366,7 +336,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const confirmacao =
       confirmarSenhaInput.value;
 
-
     if (confirmacao === "") {
 
       mostrarErro(
@@ -376,9 +345,7 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       return false;
-
     }
-
 
     if (confirmacao !== senhaInput.value) {
 
@@ -389,9 +356,7 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       return false;
-
     }
-
 
     removerErro(
       confirmarSenhaInput,
@@ -403,61 +368,48 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
+  function validarEtapaDados() {
+
+    const nomeValido = validarNome();
+    const emailValido = validarEmail();
+    const celularValido = validarCelular();
+
+    return (
+      nomeValido &&
+      emailValido &&
+      celularValido
+    );
+
+  }
+
+
   function irParaEtapaSenha() {
 
-    // Valida todos os campos da etapa 1.
+    if (enviandoCadastro) return;
 
-    const nomeValido =
-      validarNome();
+    limparErroCadastro();
 
-    const emailValido =
-      validarEmail();
+    if (!validarEtapaDados()) {
 
-    const celularValido =
-      validarCelular();
+      if (!nomeInput.hasAttribute("aria-invalid")) {
 
-
-    // Se algum campo for inválido,
-    // permanece na primeira etapa.
-
-    if (
-      !nomeValido ||
-      !emailValido ||
-      !celularValido
-    ) {
-
-      if (!nomeValido) {
-
-        nomeInput.focus();
-
-      } else if (!emailValido) {
-
-        emailInput.focus();
+        if (emailInput.hasAttribute("aria-invalid")) {
+          emailInput.focus();
+        } else {
+          celularInput.focus();
+        }
 
       } else {
-
-        celularInput.focus();
-
+        nomeInput.focus();
       }
 
       return;
-
     }
 
-
-    // Esconde a primeira etapa.
-
     etapaDados.classList.add("hidden");
-
-
-    // Mostra a etapa da senha.
-
     etapaSenha.classList.remove("hidden");
 
-
     etapaAtual = 2;
-
-
     senhaInput.focus();
 
   }
@@ -465,46 +417,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function voltarParaEtapaDados() {
 
-    etapaSenha.classList.add("hidden");
+    if (enviandoCadastro) return;
 
+    etapaSenha.classList.add("hidden");
     etapaDados.classList.remove("hidden");
 
     etapaAtual = 1;
 
+    limparErroCadastro();
     nomeInput.focus();
 
   }
 
 
-  function alternarVisibilidadeSenha(
-    input,
-    botao
-  ) {
+  function alternarVisibilidadeSenha(input, botao) {
 
     const estaOculta =
       input.type === "password";
 
+    input.type =
+      estaOculta ? "text" : "password";
 
-    if (estaOculta) {
-
-      input.type = "text";
-
-      botao.setAttribute(
-        "aria-label",
-        "Ocultar senha"
-      );
-
-    } else {
-
-      input.type = "password";
-
-      botao.setAttribute(
-        "aria-label",
-        "Mostrar senha"
-      );
-
-    }
-
+    botao.setAttribute(
+      "aria-label",
+      estaOculta ? "Ocultar senha" : "Mostrar senha"
+    );
 
     botao.setAttribute(
       "aria-pressed",
@@ -514,31 +451,75 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  // Valida quando o usuário sai do campo.
+  function exibirModalSucesso() {
+
+    // Mostra o modal que já existe no HTML
+
+    modalSucesso.classList.remove("hidden");
+    modalSucesso.classList.add("flex");
+
+    document.body.classList.add("overflow-hidden");
+
+    document.querySelector("main").inert = true;
+    modalSucesso.focus();
+
+
+    // Ativa a transição definida com Tailwind
+
+    requestAnimationFrame(() => {
+
+      requestAnimationFrame(() => {
+
+        caixaModalSucesso.classList.remove(
+          "opacity-0",
+          "translate-y-3",
+          "scale-95"
+        );
+
+        caixaModalSucesso.classList.add(
+          "opacity-100",
+          "translate-y-0",
+          "scale-100"
+        );
+
+      });
+
+    });
+
+
+    // Aguarda 1,5 segundo e abre o login
+
+    setTimeout(() => {
+
+      window.location.href =
+        "./login-usuario.html";
+
+    }, 1500);
+
+  }
+
+
+  // Eventos dos campos
 
   nomeInput.addEventListener(
     "blur",
     validarNome
   );
 
-
   emailInput.addEventListener(
     "blur",
     validarEmail
   );
-
 
   celularInput.addEventListener(
     "blur",
     validarCelular
   );
 
-
   senhaInput.addEventListener(
     "blur",
     validarSenha
   );
-
 
   confirmarSenhaInput.addEventListener(
     "blur",
@@ -548,205 +529,141 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Validação durante a digitação
 
-  // Nome
+  nomeInput.addEventListener("input", () => {
 
-  nomeInput.addEventListener(
-    "input",
-    function () {
+    limparErroCadastro();
 
-      if (
-        !erroNome.classList.contains("hidden")
-      ) {
-
-        validarNome();
-
-      }
-
+    if (!erroNome.classList.contains("hidden")) {
+      validarNome();
     }
-  );
+
+  });
 
 
-  // E-mail
+  emailInput.addEventListener("input", () => {
 
-  emailInput.addEventListener(
-    "input",
-    function () {
+    limparErroCadastro();
 
-      if (
-        !erroEmail.classList.contains("hidden")
-      ) {
-
-        validarEmail();
-
-      }
-
+    if (!erroEmail.classList.contains("hidden")) {
+      validarEmail();
     }
-  );
+
+  });
 
 
-  // Celular
+  celularInput.addEventListener("input", () => {
 
-  celularInput.addEventListener(
-    "input",
-    function () {
+    limparErroCadastro();
 
-      celularInput.value =
-        aplicarMascaraCelular(
-          celularInput.value
-        );
+    celularInput.value =
+      aplicarMascaraCelular(celularInput.value);
 
-
-      if (
-        !erroCelular.classList.contains("hidden")
-      ) {
-
-        validarCelular();
-
-      }
-
+    if (!erroCelular.classList.contains("hidden")) {
+      validarCelular();
     }
-  );
+
+  });
 
 
-  // Senha
+  senhaInput.addEventListener("input", () => {
 
-  senhaInput.addEventListener(
-    "input",
-    function () {
+    limparErroCadastro();
 
-      if (
-        !erroSenha.classList.contains("hidden")
-      ) {
-
-        validarSenha();
-
-      }
-
-
-      // Atualiza a confirmação se
-      // a senha principal for alterada.
-
-      if (
-        !erroConfirmarSenha.classList.contains(
-          "hidden"
-        )
-      ) {
-
-        validarConfirmacaoSenha();
-
-      }
-
+    if (!erroSenha.classList.contains("hidden")) {
+      validarSenha();
     }
-  );
 
-
-  // Confirmar senha
-
-  confirmarSenhaInput.addEventListener(
-    "input",
-    function () {
-
-      if (
-        !erroConfirmarSenha.classList.contains(
-          "hidden"
-        )
-      ) {
-
-        validarConfirmacaoSenha();
-
-      }
-
+    if (
+      !erroConfirmarSenha.classList.contains("hidden")
+    ) {
+      validarConfirmacaoSenha();
     }
-  );
+
+  });
 
 
-  // Botão Próximo
+  confirmarSenhaInput.addEventListener("input", () => {
+
+    limparErroCadastro();
+
+    if (
+      !erroConfirmarSenha.classList.contains("hidden")
+    ) {
+      validarConfirmacaoSenha();
+    }
+
+  });
+
+
+  // Eventos dos botões
 
   btnProximo.addEventListener(
     "click",
     irParaEtapaSenha
   );
 
-
-  // Botão Voltar
-
   btnVoltar.addEventListener(
     "click",
     voltarParaEtapaDados
   );
 
+  btnMostrarSenha.addEventListener("click", () => {
 
-  // Mostrar / esconder senha
+    alternarVisibilidadeSenha(
+      senhaInput,
+      btnMostrarSenha
+    );
 
-  btnMostrarSenha.addEventListener(
-    "click",
-    function () {
+  });
 
-      alternarVisibilidadeSenha(
-        senhaInput,
-        btnMostrarSenha
-      );
+  btnMostrarConfirmacao.addEventListener("click", () => {
 
-    }
-  );
+    alternarVisibilidadeSenha(
+      confirmarSenhaInput,
+      btnMostrarConfirmacao
+    );
+
+  });
 
 
-  // Mostrar / esconder confirmação
-
-  btnMostrarConfirmacao.addEventListener(
-    "click",
-    function () {
-
-      alternarVisibilidadeSenha(
-        confirmarSenhaInput,
-        btnMostrarConfirmacao
-      );
-
-    }
-  );
-
+  // Envio para a API Java
 
   formCadastro.addEventListener(
     "submit",
-    function (event) {
+    async function (event) {
 
       event.preventDefault();
 
+      if (enviandoCadastro) return;
 
-      // Se apertar Enter na etapa 1,
-      // tenta avançar para a etapa 2.
+
+      // Enter na primeira etapa
 
       if (etapaAtual === 1) {
 
         irParaEtapaSenha();
-
         return;
 
       }
 
-
-      // Valida os campos de senha.
-
-      const senhaValida =
-        validarSenha();
-
-      const confirmacaoValida =
-        validarConfirmacaoSenha();
+      limparErroCadastro();
 
 
-      if (
-        !senhaValida ||
-        !confirmacaoValida
-      ) {
+      // Confere novamente os dados pessoais
 
-        if (!senhaValida) {
+      if (!validarEtapaDados()) {
 
-          senhaInput.focus();
+        etapaSenha.classList.add("hidden");
+        etapaDados.classList.remove("hidden");
 
+        etapaAtual = 1;
+
+        if (nomeInput.hasAttribute("aria-invalid")) {
+          nomeInput.focus();
+        } else if (emailInput.hasAttribute("aria-invalid")) {
+          emailInput.focus();
         } else {
-
-          confirmarSenhaInput.focus();
-
+          celularInput.focus();
         }
 
         return;
@@ -754,54 +671,154 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
 
-      // Dados prontos para integração
-      // com o backend Java.
+      // Valida senha e confirmação
+
+      const senhaValida = validarSenha();
+
+      const confirmacaoValida =
+        validarConfirmacaoSenha();
+
+      if (!senhaValida || !confirmacaoValida) {
+
+        if (!senhaValida) {
+          senhaInput.focus();
+        } else {
+          confirmarSenhaInput.focus();
+        }
+
+        return;
+
+      }
+
+
+      // Prepara os dados para o backend
+
+      // Não envia o campo confirmarSenha
 
       const dadosCadastro = {
 
-        nome:
-          nomeInput.value.trim(),
+        nome: nomeInput.value.trim(),
 
-        email:
-          emailInput.value
-            .trim()
-            .toLowerCase(),
+        email: emailInput.value
+          .trim()
+          .toLowerCase(),
 
-        celular:
-          celularInput.value,
+        celular: obterNumerosCelular(
+          celularInput.value
+        ),
 
-        senha:
-          senhaInput.value
+        senha: senhaInput.value
 
       };
 
 
-      /*
-        FUTURAMENTE:
+      // Impede envios duplicados
 
-        Enviar dadosCadastro via HTTPS
-        para a API Java.
+      enviandoCadastro = true;
 
-        O backend deverá:
+      btnCadastrar.disabled = true;
+      btnVoltar.disabled = true;
 
-        1. Validar os dados novamente.
-        2. Verificar se o e-mail já existe.
-        3. Gerar o hash seguro da senha.
-        4. Salvar o usuário no MongoDB.
+      btnCadastrar.textContent = "Cadastrando...";
 
-        IMPORTANTE:
-
-        Nunca salvar a senha em texto
-        puro no banco de dados.
-
-        Nunca armazenar a senha no
-        localStorage ou exibi-la no console.
-      */
+      let cadastroConfirmado = false;
 
 
-      alert(
-        "Dados validados! Falta conectar o cadastro ao backend para salvar o usuário."
-      );
+      try {
+
+        // Envia os dados ao Java
+
+        const resposta = await fetch(API_URL, {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify(dadosCadastro)
+
+        });
+
+
+        const resultado =
+          await resposta.json().catch(
+            () => ({})
+          );
+
+
+        // Tratamento de erros da API
+
+        if (!resposta.ok) {
+
+          // E-mail já cadastrado
+
+          if (resposta.status === 409) {
+
+            etapaSenha.classList.add("hidden");
+            etapaDados.classList.remove("hidden");
+
+            etapaAtual = 1;
+
+            mostrarErro(
+              emailInput,
+              erroEmail,
+              resultado.mensagem ||
+                "Este e-mail já está cadastrado."
+            );
+
+            emailInput.focus();
+
+          } else {
+
+            mostrarErroCadastro(
+              resultado.mensagem ||
+                "Não foi possível realizar o cadastro."
+            );
+
+          }
+
+          return;
+
+        }
+
+
+        // Cadastro realizado com sucesso
+
+        cadastroConfirmado = true;
+
+        // O Java confirmou o cadastro no banco
+
+        // Agora mostramos o modal do HTML
+
+        exibirModalSucesso();
+
+
+      } catch (erro) {
+
+        mostrarErroCadastro(
+          "Não foi possível confirmar o cadastro. " +
+          "Verifique se o backend Java está ligado " +
+          "e confira o e-mail antes de tentar novamente."
+        );
+
+      } finally {
+
+        // Se houve sucesso, os botões permanecem
+        // bloqueados até o redirecionamento.
+
+        if (!cadastroConfirmado) {
+
+          enviandoCadastro = false;
+
+          btnCadastrar.disabled = false;
+          btnVoltar.disabled = false;
+
+          btnCadastrar.textContent = "Cadastrar";
+
+        }
+
+      }
 
     }
   );
