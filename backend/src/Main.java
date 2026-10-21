@@ -11,97 +11,94 @@ import com.mongodb.client.model.IndexOptions;
 
 import org.bson.Document;
 
+import controller.DashboardHandler;
+import controller.RelatoriosHandler;
+
 public class Main {
 
     public static void main(String[] args) throws Exception {
 
         // Conecta ao MongoDB Atlas
-        MongoClient cliente =
-            MongoDBConnection.conectar();
+        MongoClient cliente = MongoDBConnection.conectar();
 
         try {
 
             // Seleciona o banco
-            MongoDatabase banco =
-                cliente.getDatabase(
-                    "desperdicio_alimentos"
-                );
+            MongoDatabase banco = cliente.getDatabase(
+                    "desperdicio_alimentos");
 
             // Verifica a conexão
             banco.runCommand(
-                new Document("ping", 1)
-            );
+                    new Document("ping", 1));
 
             // Seleciona a collection users
-            MongoCollection<Document> usuarios =
-                banco.getCollection("users");
+            MongoCollection<Document> usuarios = banco.getCollection("users");
 
             // Impede e-mails duplicados
             usuarios.createIndex(
-                Indexes.ascending("email"),
-                new IndexOptions().unique(true)
-            );
+                    Indexes.ascending("email"),
+                    new IndexOptions().unique(true));
 
             // Cria o servidor HTTP local
-            HttpServer servidor =
-                HttpServer.create(
+            HttpServer servidor = HttpServer.create(
                     new InetSocketAddress(
-                        "127.0.0.1",
-                        8080
-                    ),
-                    0
-                );
+                            "127.0.0.1",
+                            8080),
+                    0);
 
             // Registra a rota de cadastro
             servidor.createContext(
-                "/api/usuarios",
-                new UsuariosHandler(usuarios)
-            );
+                    "/api/usuarios",
+                    new UsuariosHandler(usuarios));
 
             // Colecao de produtos
-            MongoCollection<Document> produtos =
-                banco.getCollection("itens");
+            MongoCollection<Document> produtos = banco.getCollection("itens");
+            MongoCollection<Document> lotes = banco.getCollection("lotes");
+
+            // Rota de resumo do Dashboard
+            servidor.createContext(
+                    "/api/dashboard/resumo",
+                    // passo como parâmetro o documento itens que está associado a variável produtos
+                    new DashboardHandler(produtos, lotes));
+
+            // Rota de relatório de estoque por produto
+            servidor.createContext(
+                    "/api/relatorios/estoque-por-produto",
+                    new RelatoriosHandler(produtos, lotes));
 
             // Colecao de categorias
-            MongoCollection<Document> categorias =
-                banco.getCollection("categorias");
+            MongoCollection<Document> categorias = banco.getCollection("categorias");
 
             // Handler compartilhado dos produtos e categorias
-            ProdutosHandler produtosHandler =
-                new ProdutosHandler(produtos, categorias);
+            ProdutosHandler produtosHandler = new ProdutosHandler(produtos, categorias);
 
             // Rota de cadastro dos produtos
             servidor.createContext(
-                "/api/produtos",
-                produtosHandler
-            );
+                    "/api/produtos",
+                    produtosHandler);
 
             // Rota de consulta das categorias
             servidor.createContext(
-                "/api/categorias",
-                produtosHandler
-            );
+                    "/api/categorias",
+                    produtosHandler);
 
             // Fecha recursos quando o servidor parar
             Runtime.getRuntime().addShutdownHook(
-                new Thread(() -> {
+                    new Thread(() -> {
 
-                    servidor.stop(0);
-                    cliente.close();
+                        servidor.stop(0);
+                        cliente.close();
 
-                })
-            );
+                    }));
 
             // Inicia o servidor
             servidor.start();
 
             System.out.println(
-                "Servidor iniciado em http://localhost:8080/"
-            );
+                    "Servidor iniciado em http://localhost:8080/");
 
             System.out.println(
-                "MongoDB conectado com sucesso!"
-            );
+                    "MongoDB conectado com sucesso!");
 
         } catch (Exception erro) {
 
