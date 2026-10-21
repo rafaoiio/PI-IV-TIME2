@@ -1,3 +1,4 @@
+
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
@@ -65,7 +66,7 @@ public class Main {
             servidor.createContext(
                     "/api/relatorios/estoque-por-produto",
                     new RelatoriosHandler(produtos, lotes));
-          
+
             // Colecao de categorias
             MongoCollection<Document> categorias =
                 banco.getCollection("categorias");
@@ -92,6 +93,12 @@ public class Main {
             servidor.createContext(
                 "/api/lotes",
                 lotesHandler
+            );
+
+            // Rota de proximos vencimentos - Laura
+            servidor.createContext(
+                "/api/lotes/proximos-vencimento",
+                new ProximosVencimentoHandler(lotes, produtos)
             );
 
             // Fecha recursos quando o servidor parar
