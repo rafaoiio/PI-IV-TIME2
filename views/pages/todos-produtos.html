@@ -13,10 +13,12 @@
 
 <body class="flex min-h-screen bg-background">
 
+    <!-- MENU LATERAL -->
     <aside id="aside-placeholder" class="w-[180px] shrink-0"></aside>
 
     <div class="flex min-w-0 flex-1 flex-col">
 
+        <!-- CABEÇALHO -->
         <div id="header-placeholder"></div>
 
         <main class="flex-1">
@@ -71,30 +73,50 @@
                     <!-- TABELA DE PRODUTOS -->
                     <div class="w-full overflow-x-auto">
 
-                        <table class="w-full min-w-[650px] border-collapse text-left text-xs text-text">
+                        <table class="w-full min-w-[1000px] border-collapse text-left text-xs text-text">
 
-                            <!-- CABECALHO -->
+                            <!-- CABEÇALHO DA TABELA -->
                             <thead>
 
                                 <tr class="border-b border-gray-400 text-text-secondary">
 
-                                    <th class="px-3 py-2 font-medium">
+                                    <!-- TÍTULO -->
+                                    <th class="px-3 py-3 font-medium">
                                         Título
                                     </th>
 
-                                    <th class="px-3 py-2 font-medium">
+                                    <!-- CATEGORIA -->
+                                    <th class="px-3 py-3 font-medium">
                                         Categoria
                                     </th>
 
-                                    <th class="px-3 py-2 font-medium">
+                                    <!-- UNIDADE DE MEDIDA -->
+                                    <th class="px-3 py-3 font-medium">
                                         Unidade de Medida
                                     </th>
 
-                                    <th class="px-3 py-2 font-medium">
+                                    <!-- QUANTIDADE TOTAL -->
+                                    <th class="px-3 py-3 font-medium">
+                                        Quantidade Total
+                                    </th>
+
+                                    <!-- PREÇO UNITÁRIO -->
+                                    <th class="px-3 py-3 font-medium">
+                                        Preço Unitário
+                                    </th>
+
+                                    <!-- VALIDADE -->
+                                    <th class="px-3 py-3 font-medium">
+                                        Validade
+                                    </th>
+
+                                    <!-- STATUS -->
+                                    <th class="px-3 py-3 font-medium">
                                         Status
                                     </th>
 
-                                    <th class="px-3 py-2 text-center font-medium">
+                                    <!-- AÇÕES -->
+                                    <th class="px-3 py-3 text-center font-medium">
                                         Ações
                                     </th>
 
@@ -102,13 +124,16 @@
 
                             </thead>
 
-                            <!-- PRODUTOS DO MONGODB -->
+                            <!-- PRODUTOS CARREGADOS DO MONGODB -->
                             <tbody id="tabelaProdutos">
 
                                 <tr>
-                                    <td colspan="5"
+
+                                    <td colspan="8"
                                         class="px-3 py-6 text-center text-text-secondary">
+
                                         Carregando produtos...
+
                                     </td>
                                 </tr>
 
@@ -118,12 +143,19 @@
 
                     </div>
 
+                    <!-- MENSAGEM DE ERRO -->
+                    <p id="mensagemErro"
+                        class="mt-4 hidden text-xs text-red-600"
+                        role="alert">
+                    </p>
+
                 </section>
 
             </div>
 
         </main>
 
+        <!-- RODAPÉ -->
         <div id="footer-placeholder"></div>
 
     </div>
