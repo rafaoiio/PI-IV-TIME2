@@ -65,6 +65,10 @@ public class Main {
             // Colecao de categorias
             MongoCollection<Document> categorias =
                 banco.getCollection("categorias");
+            
+            // Colecao de lotes
+            MongoCollection<Document> lotes =
+                banco.getCollection("lotes");
 
             // Handler compartilhado dos produtos e categorias
             ProdutosHandler produtosHandler =
@@ -80,6 +84,16 @@ public class Main {
             servidor.createContext(
                 "/api/categorias",
                 produtosHandler
+            );
+
+            // Handler responsavel pelo cadastro dos lotes
+            LotesHandler lotesHandler =
+                new LotesHandler(lotes, produtos);
+
+            // Registra a rota de cadastro dos lotes
+            servidor.createContext(
+                "/api/lotes",
+                lotesHandler
             );
 
             // Fecha recursos quando o servidor parar
