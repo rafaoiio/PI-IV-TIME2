@@ -1,3 +1,8 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+import org.bson.types.Decimal128;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -23,18 +28,19 @@ public class ProdutosHandler implements HttpHandler {
 
     private final MongoCollection<Document> itens;
     private final MongoCollection<Document> categorias;
+    private final MongoCollection<Document> lotes;
 
     private static final Set<String> ORIGENS = Set.of(
-        "http://localhost:5500",
-        "http://127.0.0.1:5500"
-    );
+            "http://localhost:5500",
+            "http://127.0.0.1:5500");
 
     public ProdutosHandler(
-        MongoCollection<Document> itens,
-        MongoCollection<Document> categorias
-    ) {
+            MongoCollection<Document> itens,
+            MongoCollection<Document> categorias,
+            MongoCollection<Document> lotes) {
         this.itens = itens;
         this.categorias = categorias;
+        this.lotes = lotes;
     }
 
     @Override
@@ -51,21 +57,17 @@ public class ProdutosHandler implements HttpHandler {
 
         if (origem != null) {
             requisicao.getResponseHeaders().set(
-                "Access-Control-Allow-Origin", origem
-            );
+                    "Access-Control-Allow-Origin", origem);
 
             requisicao.getResponseHeaders().set(
-                "Access-Control-Allow-Headers", "Content-Type"
-            );
+                    "Access-Control-Allow-Headers", "Content-Type");
 
             requisicao.getResponseHeaders().set(
-                "Access-Control-Allow-Methods",
-                "GET, POST, OPTIONS"
-            );
+                    "Access-Control-Allow-Methods",
+                    "GET, POST, OPTIONS");
 
             requisicao.getResponseHeaders().set(
-                "Vary", "Origin"
-            );
+                    "Vary", "Origin");
         }
 
         String metodo = requisicao.getRequestMethod();
@@ -103,14 +105,13 @@ public class ProdutosHandler implements HttpHandler {
     private static String gerarCodigo(String nome) {
 
         String texto = Normalizer.normalize(
-            nome.trim().toLowerCase(java.util.Locale.ROOT),
-            Normalizer.Form.NFD
-        );
+                nome.trim().toLowerCase(java.util.Locale.ROOT),
+                Normalizer.Form.NFD);
 
         return texto
-            .replaceAll("\\p{M}", "")
-            .replaceAll("[^a-z0-9]+", "-")
-            .replaceAll("^-|-$", "");
+                .replaceAll("\\p{M}", "")
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("^-|-$", "");
     }
 
     // Lista as categorias existentes.
@@ -125,24 +126,21 @@ public class ProdutosHandler implements HttpHandler {
 
                 if (nome != null && !nome.isBlank()) {
                     lista.add(new Document()
-                        .append("id",
-                            categoria.getObjectId("_id").toHexString())
-                        .append("nome", nome)
-                    );
+                            .append("id",
+                                    categoria.getObjectId("_id").toHexString())
+                            .append("nome", nome));
                 }
             }
 
             responderJSON(
-                requisicao,
-                200,
-                new Document("categorias", lista)
-            );
+                    requisicao,
+                    200,
+                    new Document("categorias", lista));
 
         } catch (MongoException erro) {
             responder(
-                requisicao, 500,
-                "Erro ao buscar categorias."
-            );
+                    requisicao, 500,
+                    "Erro ao buscar categorias.");
         }
     }
 
@@ -162,8 +160,7 @@ public class ProdutosHandler implements HttpHandler {
 
         try {
             dados = Document.parse(
-                new String(conteudo, StandardCharsets.UTF_8)
-            );
+                    new String(conteudo, StandardCharsets.UTF_8));
         } catch (RuntimeException erro) {
             responder(requisicao, 400, "JSON invalido.");
             return;
@@ -171,22 +168,17 @@ public class ProdutosHandler implements HttpHandler {
 
         String nome = obterTexto(dados, "nomeProduto").trim();
 
-        String nomeCategoria =
-            obterTexto(dados, "categoria")
+        String nomeCategoria = obterTexto(dados, "categoria")
                 .trim()
                 .replaceAll("\\s+", " ");
 
-        String quantidadeUnidadeTexto =
-            obterTexto(dados, "quantidadeUnidade").trim();
+        String quantidadeUnidadeTexto = obterTexto(dados, "quantidadeUnidade").trim();
 
-        String unidade =
-            obterTexto(dados, "unidadeMedida").trim();
+        String unidade = obterTexto(dados, "unidadeMedida").trim();
 
-        String status =
-            obterTexto(dados, "status").trim();
+        String status = obterTexto(dados, "status").trim();
 
-        String observacao =
-            obterTexto(dados, "observacao").trim();
+        String observacao = obterTexto(dados, "observacao").trim();
 
         if (nome.isEmpty() || nome.length() > 150) {
             responder(requisicao, 400, "Nome do produto invalido.");
@@ -210,8 +202,7 @@ public class ProdutosHandler implements HttpHandler {
 
         try {
             quantidadeUnidade = Double.parseDouble(
-                quantidadeUnidadeTexto.replace(",", ".")
-            );
+                    quantidadeUnidadeTexto.replace(",", "."));
         } catch (NumberFormatException erro) {
             responder(requisicao, 400, "Quantidade da unidade invalida.");
             return;
@@ -243,61 +234,54 @@ public class ProdutosHandler implements HttpHandler {
 
             // Procura primeiro pelo codigo da categoria.
             Document categoria = categorias.find(
-                eq("codigo", codigoCategoria)
-            ).first();
+                    eq("codigo", codigoCategoria)).first();
 
             // Tambem procura categorias antigas apenas pelo nome.
             if (categoria == null) {
                 categoria = categorias.find(
-                    regex(
-                        "nome",
-                        "^" + Pattern.quote(nomeCategoria) + "$",
-                        "i"
-                    )
-                ).first();
+                        regex(
+                                "nome",
+                                "^" + Pattern.quote(nomeCategoria) + "$",
+                                "i"))
+                        .first();
             }
 
             // Se a categoria nao existir, cria uma nova.
             if (categoria == null) {
 
                 categoria = new Document()
-                    .append("nome", nomeCategoria)
-                    .append("codigo", codigoCategoria)
-                    .append("criadoEm", new Date());
+                        .append("nome", nomeCategoria)
+                        .append("codigo", codigoCategoria)
+                        .append("criadoEm", new Date());
 
                 categorias.insertOne(categoria);
             }
 
-            ObjectId categoriaId =
-                categoria.getObjectId("_id");
+            ObjectId categoriaId = categoria.getObjectId("_id");
 
             // Cria o documento do produto.
             Document produto = new Document()
-                .append("nome", nome)
-                .append("categoriaId", categoriaId)
-                .append("quantidadeUnidade", quantidadeUnidade)
-                .append("unidadeMedida", unidade)
-                .append("status", status)
-                .append("observacao", observacao)
-                .append("criadoEm", new Date());
-
+                    .append("nome", nome)
+                    .append("categoriaId", categoriaId)
+                    .append("quantidadeUnidade", quantidadeUnidade)
+                    .append("unidadeMedida", unidade)
+                    .append("status", status)
+                    .append("observacao", observacao)
+                    .append("criadoEm", new Date());
 
             // Salva na colecao itens.
             itens.insertOne(produto);
 
             Document resposta = new Document()
-                .append(
-                    "mensagem",
-                    "Produto cadastrado com sucesso!"
-                )
-                .append(
-                    "id",
-                    produto.getObjectId("_id").toHexString()
-                )
-                .append(
-                    "categoriaId",
-                    categoriaId.toHexString()
-                );
+                    .append(
+                            "mensagem",
+                            "Produto cadastrado com sucesso!")
+                    .append(
+                            "id",
+                            produto.getObjectId("_id").toHexString())
+                    .append(
+                            "categoriaId",
+                            categoriaId.toHexString());
 
             responderJSON(requisicao, 201, resposta);
 
@@ -305,22 +289,19 @@ public class ProdutosHandler implements HttpHandler {
             System.err.println(erro.getMessage());
 
             responder(
-                requisicao, 500,
-                "Erro ao acessar o banco de dados."
-            );
+                    requisicao, 500,
+                    "Erro ao acessar o banco de dados.");
 
         } catch (RuntimeException erro) {
             System.err.println(erro.getMessage());
 
             responder(
-                requisicao, 500,
-                "Erro interno ao cadastrar produto."
-            );
+                    requisicao, 500,
+                    "Erro interno ao cadastrar produto.");
         }
     }
 
-    
-    // Lista todos os produtos cadastrados no MongoDB.
+    // Lista produtos e consulta seus lotes.
     private void listarProdutos(HttpExchange requisicao)
             throws IOException {
 
@@ -328,136 +309,252 @@ public class ProdutosHandler implements HttpHandler {
 
             List<Document> listaProdutos = new ArrayList<>();
 
-            // Busca os produtos da colecao itens.
+            // Busca todos os produtos cadastrados.
             for (Document produto : itens.find()) {
+
+                ObjectId produtoId = produto.getObjectId("_id");
+
+                // CATEGORIA DO PRODUTO
 
                 String nomeCategoria = "Sem categoria";
 
-                // Recupera o ID da categoria do produto.
-                ObjectId categoriaId =
-                    produto.getObjectId("categoriaId");
+                ObjectId categoriaId = produto.getObjectId("categoriaId");
 
-                // Busca o nome da categoria no MongoDB.
                 if (categoriaId != null) {
 
                     Document categoria = categorias.find(
-                        eq("_id", categoriaId)
-                    ).first();
+                            eq("_id", categoriaId)).first();
 
                     if (categoria != null) {
-                        nomeCategoria = categoria.getString("nome");
+                        String nome = categoria.getString("nome");
+
+                        if (nome != null) {
+                            nomeCategoria = nome;
+                        }
                     }
                 }
 
-                // Prepara as informacoes do produto.
+                // UNIDADE DE MEDIDA DO PRODUTO
+
+                BigDecimal quantidadeUnidade = obterDecimal(produto, "quantidadeUnidade");
+
+                String unidadeMedida = produto.getString("unidadeMedida");
+
+                // DADOS DOS LOTES
+
+                BigDecimal quantidadeTotal = BigDecimal.ZERO;
+
+                BigDecimal custoEstoque = BigDecimal.ZERO;
+
+                BigDecimal quantidadeComPreco = BigDecimal.ZERO;
+
+                Date validadeMaisProxima = null;
+
+                // Busca os lotes relacionados ao item.
+                for (Document lote : lotes.find(
+                        eq("itemId", produtoId))) {
+
+                    BigDecimal quantidadeDisponivel = obterDecimal(
+                            lote,
+                            "quantidadeDisponivel");
+
+                    BigDecimal quantidadeInicial = obterDecimal(
+                            lote,
+                            "quantidadeInicial");
+
+                    BigDecimal custoTotal = obterDecimal(
+                            lote,
+                            "custoTotalAquisicao");
+
+                    // Considera apenas estoque disponivel.
+                    if (quantidadeDisponivel.signum() <= 0) {
+                        continue;
+                    }
+
+                    // Soma as unidades disponiveis.
+                    quantidadeTotal = quantidadeTotal.add(
+                            quantidadeDisponivel);
+
+                    // CALCULO DO PRECO UNITARIO
+
+                    // O custo total representa o custo
+                    // de todas as unidades recebidas.
+                    if (quantidadeInicial.signum() > 0
+                            && lote.get("custoTotalAquisicao") != null) {
+
+                        BigDecimal precoDoLote = custoTotal.divide(
+                                quantidadeInicial,
+                                10,
+                                RoundingMode.HALF_UP);
+
+                        // Custo correspondente ao estoque atual.
+                        custoEstoque = custoEstoque.add(
+                                precoDoLote.multiply(
+                                        quantidadeDisponivel));
+
+                        quantidadeComPreco = quantidadeComPreco.add(
+                                quantidadeDisponivel);
+                    }
+
+                    // VALIDADE MAIS PROXIMA
+
+                    Date validade = lote.getDate("dataValidade");
+
+                    if (validade != null) {
+
+                        if (validadeMaisProxima == null
+                                || validade.before(
+                                        validadeMaisProxima)) {
+
+                            validadeMaisProxima = validade;
+                        }
+                    }
+                }
+
+                // PRECO MEDIO PONDERADO
+
+                String precoUnitario = null;
+
+                if (quantidadeComPreco.signum() > 0) {
+
+                    BigDecimal precoMedio = custoEstoque.divide(
+                            quantidadeComPreco,
+                            2,
+                            RoundingMode.HALF_UP);
+
+                    precoUnitario = precoMedio.toPlainString();
+                }
+
+                // DATA DE VALIDADE
+
+                String dataValidade = null;
+
+                if (validadeMaisProxima != null) {
+
+                    dataValidade = validadeMaisProxima
+                            .toInstant()
+                            .toString();
+                }
+
+                // DADOS ENVIADOS AO FRONTEND
+
                 Document resultado = new Document()
-                    .append(
-                        "id",
-                        produto.getObjectId("_id").toHexString()
-                    )
-                    .append(
-                        "nome",
-                        produto.getString("nome")
-                    )
-                    .append(
-                        "categoria",
-                        nomeCategoria
-                    )
-                    .append(
-                        "unidadeMedida",
-                        produto.getString("unidadeMedida")
-                    )
-                    .append(
-                        "status",
-                        produto.getString("status")
-                    )
-                    .append(
-                        "observacao",
-                        produto.getString("observacao")
-                    );
+                        .append(
+                                "id",
+                                produtoId.toHexString())
+                        .append(
+                                "nome",
+                                produto.getString("nome"))
+                        .append(
+                                "categoria",
+                                nomeCategoria)
+                        .append(
+                                "quantidadeUnidade",
+                                quantidadeUnidade.toPlainString())
+                        .append(
+                                "unidadeMedida",
+                                unidadeMedida)
+                        .append(
+                                "quantidadeTotal",
+                                quantidadeTotal.toPlainString())
+                        .append(
+                                "precoUnitario",
+                                precoUnitario)
+                        .append(
+                                "dataValidade",
+                                dataValidade)
+                        .append(
+                                "status",
+                                produto.getString("status"))
+                        .append(
+                                "observacao",
+                                produto.getString("observacao"));
 
                 listaProdutos.add(resultado);
             }
 
-            // Retorna os produtos em formato JSON.
             responderJSON(
-                requisicao,
-                200,
-                new Document("produtos", listaProdutos)
-            );
+                    requisicao,
+                    200,
+                    new Document("produtos", listaProdutos));
 
         } catch (MongoException erro) {
 
             System.err.println(
-                "Erro ao listar produtos: " + erro.getMessage()
-            );
+                    "Erro ao buscar produtos: " + erro.getMessage());
 
             responder(
-                requisicao,
-                500,
-                "Erro ao buscar produtos."
-            );
+                    requisicao,
+                    500,
+                    "Erro ao buscar produtos no banco.");
 
         } catch (RuntimeException erro) {
 
             System.err.println(
-                "Erro ao processar produtos: " + erro.getMessage()
-            );
+                    "Erro ao processar produtos: " + erro.getMessage());
 
             responder(
-                requisicao,
-                500,
-                "Erro interno ao listar produtos."
-            );
+                    requisicao,
+                    500,
+                    "Erro interno ao listar produtos.");
         }
     }
 
+    // Converte numeros do MongoDB para BigDecimal.
+    private static BigDecimal obterDecimal(
+            Document documento,
+            String campo) {
+        Object valor = documento.get(campo);
+
+        if (valor instanceof Decimal128) {
+            return ((Decimal128) valor).bigDecimalValue();
+        }
+
+        if (valor instanceof Number) {
+            return new BigDecimal(valor.toString());
+        }
+
+        return BigDecimal.ZERO;
+    }
 
     private static String obterTexto(
-        Document dados,
-        String campo
-    ) {
+            Document dados,
+            String campo) {
         Object valor = dados.get(campo);
 
         return valor instanceof String
-            ? (String) valor
-            : "";
+                ? (String) valor
+                : "";
     }
 
     private static void responder(
-        HttpExchange requisicao,
-        int status,
-        String mensagem
-    ) throws IOException {
+            HttpExchange requisicao,
+            int status,
+            String mensagem) throws IOException {
 
         responderJSON(
-            requisicao,
-            status,
-            new Document("mensagem", mensagem)
-        );
+                requisicao,
+                status,
+                new Document("mensagem", mensagem));
     }
 
     private static void responderJSON(
-        HttpExchange requisicao,
-        int status,
-        Document dados
-    ) throws IOException {
+            HttpExchange requisicao,
+            int status,
+            Document dados) throws IOException {
 
         byte[] resposta = dados.toJson()
-            .getBytes(StandardCharsets.UTF_8);
+                .getBytes(StandardCharsets.UTF_8);
 
         requisicao.getResponseHeaders().set(
-            "Content-Type",
-            "application/json; charset=UTF-8"
-        );
+                "Content-Type",
+                "application/json; charset=UTF-8");
 
         requisicao.sendResponseHeaders(
-            status,
-            resposta.length
-        );
+                status,
+                resposta.length);
 
-        try (OutputStream saida =
-                requisicao.getResponseBody()) {
+        try (OutputStream saida = requisicao.getResponseBody()) {
             saida.write(resposta);
         }
     }

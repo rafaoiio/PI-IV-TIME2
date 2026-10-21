@@ -69,8 +69,13 @@ public class Main {
             // Colecao de categorias
             MongoCollection<Document> categorias = banco.getCollection("categorias");
 
-            // Handler compartilhado dos produtos e categorias
-            ProdutosHandler produtosHandler = new ProdutosHandler(produtos, categorias);
+            // Colecao de lotes
+            MongoCollection<Document> lotes =
+                banco.getCollection("lotes");
+
+            // Handler compartilhado dos produtos, categorias e lotes
+            ProdutosHandler produtosHandler =
+                new ProdutosHandler(produtos, categorias, lotes);
 
             // Rota de cadastro dos produtos
             servidor.createContext(
