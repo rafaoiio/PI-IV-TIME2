@@ -65,9 +65,10 @@ public class Main {
             servidor.createContext(
                     "/api/relatorios/estoque-por-produto",
                     new RelatoriosHandler(produtos, lotes));
-
+          
             // Colecao de categorias
-            MongoCollection<Document> categorias = banco.getCollection("categorias");
+            MongoCollection<Document> categorias =
+                banco.getCollection("categorias");
 
             // Colecao de lotes
             MongoCollection<Document> lotes =
@@ -86,6 +87,16 @@ public class Main {
             servidor.createContext(
                     "/api/categorias",
                     produtosHandler);
+
+            // Handler responsavel pelo cadastro dos lotes
+            LotesHandler lotesHandler =
+                new LotesHandler(lotes, produtos);
+
+            // Registra a rota de cadastro dos lotes
+            servidor.createContext(
+                "/api/lotes",
+                lotesHandler
+            );
 
             // Fecha recursos quando o servidor parar
             Runtime.getRuntime().addShutdownHook(
