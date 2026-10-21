@@ -13,17 +13,19 @@
 
 <body class="flex min-h-screen bg-background">
 
+    <!-- Menu lateral -->
     <aside id="aside-placeholder" class="w-[180px] shrink-0"></aside>
 
     <div class="flex min-w-0 flex-1 flex-col">
 
+        <!-- Cabeçalho -->
         <div id="header-placeholder"></div>
 
         <main class="flex-1">
 
             <div class="w-full px-6 pt-8">
 
-                // CAMINHO DA PÁGINA
+                <!-- Caminho da página -->
                 <div class="mb-8 flex min-h-[35px] items-center text-base">
 
                     <span class="text-text-secondary">
@@ -36,16 +38,17 @@
 
                 </div>
 
-                // CARD PRINCIPAL
+                <!-- Card principal -->
                 <section class="w-full rounded-md bg-white px-6 py-5">
 
+                    <!-- Título e botão adicionar lote -->
                     <div class="mb-10 flex items-center justify-between">
 
                         <h1 class="text-base font-semibold text-text">
                             Todos os lotes
                         </h1>
 
-                        // BOTÃO ADICIONAR LOTE
+                        <!-- Botão para cadastrar novo lote -->
                         <a
                             href="cadastro-lotes.html"
                             title="Cadastrar novo lote"
@@ -70,11 +73,12 @@
 
                     </div>
 
-                    // TABELA DE LOTES
+                    <!-- Tabela de lotes -->
                     <div class="w-full overflow-x-auto">
 
                         <table class="w-full min-w-[1100px] border-collapse text-left text-xs text-text">
 
+                            <!-- Cabeçalho da tabela -->
                             <thead>
 
                                 <tr class="border-b border-gray-400 text-text-secondary">
@@ -119,7 +123,7 @@
 
                             </thead>
 
-                            // OS LOTES SERÃO CARREGADOS PELO JAVASCRIPT
+                            <!-- Os lotes são carregados pelo JavaScript -->
                             <tbody id="tabelaLotes">
 
                                 <tr>
@@ -137,7 +141,7 @@
 
                     </div>
 
-                    // LEGENDA DOS STATUS
+                    <!-- Legenda dos status -->
                     <div class="mt-5 flex justify-end">
 
                         <div class="flex flex-wrap gap-4 text-[10px] text-text-secondary">
@@ -157,11 +161,15 @@
 
         </main>
 
+        <!-- Rodapé -->
         <div id="footer-placeholder"></div>
 
     </div>
 
+    <!-- Carrega os componentes da página -->
     <script src="../../public/js/load-partials.js"></script>
+
+    <!-- Carrega os lotes do MongoDB -->
     <script src="../../public/js/todos-lotes.js"></script>
 
 </body>
