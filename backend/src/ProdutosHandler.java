@@ -169,6 +169,9 @@ public class ProdutosHandler implements HttpHandler {
                 .trim()
                 .replaceAll("\\s+", " ");
 
+        String quantidadeUnidadeTexto =
+            obterTexto(dados, "quantidadeUnidade").trim();
+
         String unidade =
             obterTexto(dados, "unidadeMedida").trim();
 
@@ -193,6 +196,22 @@ public class ProdutosHandler implements HttpHandler {
 
         if (codigoCategoria.isEmpty()) {
             responder(requisicao, 400, "Categoria invalida.");
+            return;
+        }
+
+        double quantidadeUnidade;
+
+        try {
+            quantidadeUnidade = Double.parseDouble(
+                quantidadeUnidadeTexto.replace(",", ".")
+            );
+        } catch (NumberFormatException erro) {
+            responder(requisicao, 400, "Quantidade da unidade invalida.");
+            return;
+        }
+
+        if (quantidadeUnidade <= 0) {
+            responder(requisicao, 400, "A quantidade da unidade deve ser maior que zero.");
             return;
         }
 
@@ -249,10 +268,12 @@ public class ProdutosHandler implements HttpHandler {
             Document produto = new Document()
                 .append("nome", nome)
                 .append("categoriaId", categoriaId)
+                .append("quantidadeUnidade", quantidadeUnidade)
                 .append("unidadeMedida", unidade)
                 .append("status", status)
                 .append("observacao", observacao)
                 .append("criadoEm", new Date());
+
 
             // Salva na colecao itens.
             itens.insertOne(produto);
