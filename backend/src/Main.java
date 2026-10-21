@@ -11,11 +11,14 @@ import com.mongodb.client.model.IndexOptions;
 
 import org.bson.Document;
 
+import controller.DashboardHandler;
+import controller.RelatoriosHandler;
+
 public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        // Conecta ao MongoDB Atlas usando a classe existente
+        // Conecta ao MongoDB Atlas
         MongoClient cliente = MongoDBConnection.conectar();
 
         try {
@@ -31,27 +34,23 @@ public class Main {
             // COLECOES DO BANCO
             // =================================================
 
-            // Colecao de usuarios
             MongoCollection<Document> usuarios =
                     banco.getCollection("users");
+
+            MongoCollection<Document> produtos =
+                    banco.getCollection("itens");
+
+            MongoCollection<Document> categorias =
+                    banco.getCollection("categorias");
+
+            MongoCollection<Document> lotes =
+                    banco.getCollection("lotes");
 
             // Impede e-mails duplicados
             usuarios.createIndex(
                     Indexes.ascending("email"),
                     new IndexOptions().unique(true)
             );
-
-            // Colecao de produtos
-            MongoCollection<Document> produtos =
-                    banco.getCollection("itens");
-
-            // Colecao de categorias
-            MongoCollection<Document> categorias =
-                    banco.getCollection("categorias");
-
-            // Colecao de lotes
-            MongoCollection<Document> lotes =
-                    banco.getCollection("lotes");
 
             // =================================================
             // SERVIDOR HTTP
@@ -75,8 +74,13 @@ public class Main {
             // ROTAS DE PRODUTOS E CATEGORIAS
             // =================================================
 
+            // Construtor atualizado pelos colegas
             ProdutosHandler produtosHandler =
-                    new ProdutosHandler(produtos, categorias);
+                    new ProdutosHandler(
+                            produtos,
+                            categorias,
+                            lotes
+                    );
 
             servidor.createContext(
                     "/api/produtos",
@@ -86,6 +90,24 @@ public class Main {
             servidor.createContext(
                     "/api/categorias",
                     produtosHandler
+            );
+
+            // =================================================
+            // ROTAS DO DASHBOARD
+            // =================================================
+
+            servidor.createContext(
+                    "/api/dashboard/resumo",
+                    new DashboardHandler(produtos, lotes)
+            );
+
+            // =================================================
+            // ROTAS DE RELATORIOS
+            // =================================================
+
+            servidor.createContext(
+                    "/api/relatorios/estoque-por-produto",
+                    new RelatoriosHandler(produtos, lotes)
             );
 
             // =================================================

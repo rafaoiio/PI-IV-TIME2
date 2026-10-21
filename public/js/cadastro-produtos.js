@@ -11,13 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const API = "http://localhost:8080/api";
 
-    // Busca as categorias existentes no MongoDB.
     async function carregarCategorias() {
-
         try {
-            const resposta = await fetch(
-                `${API}/categorias`
-            );
+            const resposta = await fetch(`${API}/categorias`);
 
             if (!resposta.ok) {
                 throw new Error("Erro ao carregar categorias.");
@@ -25,16 +21,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const dados = await resposta.json();
 
-            // Limpa as opcoes anteriores.
             listaCategorias.replaceChildren();
 
-            // Adiciona as categorias cadastradas.
             dados.categorias.forEach((categoria) => {
-
                 const opcao = document.createElement("option");
-
                 opcao.value = categoria.nome;
-
                 listaCategorias.appendChild(opcao);
             });
 
@@ -43,16 +34,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Carrega as categorias ao abrir a pagina.
     carregarCategorias();
 
-    // Atualiza as categorias ao entrar no campo.
-    campoCategoria.addEventListener(
-        "focus",
-        carregarCategorias
-    );
+    campoCategoria.addEventListener("focus", carregarCategorias);
 
-    // Cadastro do produto.
     formulario.addEventListener("submit", async (evento) => {
 
         evento.preventDefault();
@@ -63,6 +48,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             categoria:
                 campoCategoria.value.trim(),
+
+            quantidadeUnidade:
+                document.getElementById("quantidadeUnidade").value.trim(),
 
             unidadeMedida:
                 document.getElementById("unidadeMedida").value,
@@ -82,17 +70,13 @@ document.addEventListener("DOMContentLoaded", () => {
         botao.textContent = "Cadastrando...";
 
         try {
-
-            const resposta = await fetch(
-                `${API}/produtos`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(produto)
-                }
-            );
+            const resposta = await fetch(`${API}/produtos`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(produto)
+            });
 
             const resultado = await resposta.json();
 
@@ -105,19 +89,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             alert(resultado.mensagem);
 
-            // Limpa o formulario.
             formulario.reset();
-
-            // Atualiza as categorias, incluindo a nova.
             await carregarCategorias();
 
         } catch (erro) {
-
             console.error("Erro:", erro);
             alert(erro.message);
 
         } finally {
-
             botao.disabled = false;
             botao.textContent = "Cadastrar novo produto";
         }
