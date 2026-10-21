@@ -1,6 +1,6 @@
+
 import com.sun.net.httpserver.HttpServer;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import com.mongodb.client.MongoClient;
@@ -15,92 +15,124 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        // Conecta ao MongoDB Atlas
-        MongoClient cliente =
-            MongoDBConnection.conectar();
+        // Conecta ao MongoDB Atlas usando a classe existente
+        MongoClient cliente = MongoDBConnection.conectar();
 
         try {
 
-            // Seleciona o banco
+            // Seleciona o banco de dados
             MongoDatabase banco =
-                cliente.getDatabase(
-                    "desperdicio_alimentos"
-                );
+                    cliente.getDatabase("desperdicio_alimentos");
 
-            // Verifica a conexão
-            banco.runCommand(
-                new Document("ping", 1)
-            );
+            // Verifica a conexao com o MongoDB
+            banco.runCommand(new Document("ping", 1));
 
-            // Seleciona a collection users
+            // =================================================
+            // COLECOES DO BANCO
+            // =================================================
+
+            // Colecao de usuarios
             MongoCollection<Document> usuarios =
-                banco.getCollection("users");
+                    banco.getCollection("users");
 
             // Impede e-mails duplicados
             usuarios.createIndex(
-                Indexes.ascending("email"),
-                new IndexOptions().unique(true)
-            );
-
-            // Cria o servidor HTTP local
-            HttpServer servidor =
-                HttpServer.create(
-                    new InetSocketAddress(
-                        "127.0.0.1",
-                        8080
-                    ),
-                    0
-                );
-
-            // Registra a rota de cadastro
-            servidor.createContext(
-                "/api/usuarios",
-                new UsuariosHandler(usuarios)
+                    Indexes.ascending("email"),
+                    new IndexOptions().unique(true)
             );
 
             // Colecao de produtos
             MongoCollection<Document> produtos =
-                banco.getCollection("itens");
+                    banco.getCollection("itens");
 
             // Colecao de categorias
             MongoCollection<Document> categorias =
-                banco.getCollection("categorias");
+                    banco.getCollection("categorias");
 
-            // Handler compartilhado dos produtos e categorias
+            // Colecao de lotes
+            MongoCollection<Document> lotes =
+                    banco.getCollection("lotes");
+
+            // =================================================
+            // SERVIDOR HTTP
+            // =================================================
+
+            HttpServer servidor = HttpServer.create(
+                    new InetSocketAddress("127.0.0.1", 8080),
+                    0
+            );
+
+            // =================================================
+            // ROTAS DE USUARIOS
+            // =================================================
+
+            servidor.createContext(
+                    "/api/usuarios",
+                    new UsuariosHandler(usuarios)
+            );
+
+            // =================================================
+            // ROTAS DE PRODUTOS E CATEGORIAS
+            // =================================================
+
             ProdutosHandler produtosHandler =
-                new ProdutosHandler(produtos, categorias);
+                    new ProdutosHandler(produtos, categorias);
 
-            // Rota de cadastro dos produtos
             servidor.createContext(
-                "/api/produtos",
-                produtosHandler
+                    "/api/produtos",
+                    produtosHandler
             );
 
-            // Rota de consulta das categorias
             servidor.createContext(
-                "/api/categorias",
-                produtosHandler
+                    "/api/categorias",
+                    produtosHandler
             );
 
-            // Fecha recursos quando o servidor parar
+            // =================================================
+            // ROTA DE PROXIMOS VENCIMENTOS - LAURA
+            // =================================================
+
+            servidor.createContext(
+                    "/api/lotes/proximos-vencimento",
+                    new ProximosVencimentoHandler(
+                            lotes,
+                            produtos
+                    )
+            );
+
+            // =================================================
+            // ENCERRAMENTO DO SERVIDOR
+            // =================================================
+
             Runtime.getRuntime().addShutdownHook(
-                new Thread(() -> {
+                    new Thread(() -> {
 
-                    servidor.stop(0);
-                    cliente.close();
+                        servidor.stop(0);
+                        cliente.close();
 
-                })
+                    })
             );
 
-            // Inicia o servidor
+            // =================================================
+            // INICIALIZACAO
+            // =================================================
+
             servidor.start();
 
             System.out.println(
-                "Servidor iniciado em http://localhost:8080/"
+                    "Servidor iniciado em http://localhost:8080/"
             );
 
             System.out.println(
-                "MongoDB conectado com sucesso!"
+                    "MongoDB conectado com sucesso!"
+            );
+
+            System.out.println(
+                    "API Proximos do Vencimento disponivel em:"
+            );
+
+            System.out.println(
+                    "http://localhost:8080/api/lotes/proximos-vencimento?dias=7"
             );
 
         } catch (Exception erro) {
@@ -109,7 +141,5 @@ public class Main {
             throw erro;
 
         }
-
     }
-
 }
