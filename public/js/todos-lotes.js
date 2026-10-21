@@ -143,36 +143,88 @@ document.addEventListener("DOMContentLoaded", () => {
             criarCelula(status, "text-center")
         );
 
-        // Acoes aguardam a integracao de editar e excluir
+        
+        // Cria os botoes de acoes
         const celulaAcoes = document.createElement("td");
 
         celulaAcoes.className =
-            "rounded-r-md px-3 py-3 text-center";
+            "rounded-r-md px-3 py-3";
 
+        const containerAcoes = document.createElement("div");
+
+        containerAcoes.className =
+            "flex items-center justify-center gap-3";
+
+        // Botao de editar lote
         const editar = document.createElement("button");
 
         editar.type = "button";
         editar.disabled = true;
-        editar.title = "Edição ainda não disponível";
+        editar.title = "Edicao ainda nao disponivel";
         editar.setAttribute("aria-label", "Editar lote");
+
         editar.className =
-            "mr-3 cursor-not-allowed text-gray-400";
+            "cursor-not-allowed text-primary-dark opacity-50";
 
-        editar.textContent = "Editar";
+        editar.innerHTML = `
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.8"
+                aria-hidden="true"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"
+                />
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.6 1.6-.06-.06A1.7 1.7 0 0 0 16.26 18a1.7 1.7 0 0 0-1.26 1.55V20h-2v-.45a1.7 1.7 0 0 0-1.26-1.55 1.7 1.7 0 0 0-1.88.34l-.06.06-1.6-1.6.06-.06A1.7 1.7 0 0 0 8.6 15a1.7 1.7 0 0 0-1.55-1.26H6.6v-2h.45A1.7 1.7 0 0 0 8.6 10.5a1.7 1.7 0 0 0-.34-1.88L8.2 8.56l1.6-1.6.06.06A1.7 1.7 0 0 0 11.74 7 1.7 1.7 0 0 0 13 5.45V5h2v.45A1.7 1.7 0 0 0 16.26 7a1.7 1.7 0 0 0 1.88-.34l.06-.06 1.6 1.6-.06.06A1.7 1.7 0 0 0 19.4 10.5a1.7 1.7 0 0 0 1.55 1.26h.45v2h-.45A1.7 1.7 0 0 0 19.4 15Z"
+                />
+            </svg>
+        `;
 
+        // Botao de excluir lote
         const excluir = document.createElement("button");
 
         excluir.type = "button";
         excluir.disabled = true;
-        excluir.title = "Exclusão ainda não disponível";
+        excluir.title = "Exclusao ainda nao disponivel";
         excluir.setAttribute("aria-label", "Excluir lote");
+
         excluir.className =
-            "cursor-not-allowed text-gray-400";
+            "cursor-not-allowed text-primary-dark opacity-50";
 
-        excluir.textContent = "Excluir";
+        excluir.innerHTML = `
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.8"
+                aria-hidden="true"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M3 6h18m-2 0-1 14H6L5 6m3 0V4h8v2M10 10v7m4-7v7"
+                />
+            </svg>
+        `;
 
-        celulaAcoes.appendChild(editar);
-        celulaAcoes.appendChild(excluir);
+        // Adiciona os botoes na tabela
+        containerAcoes.appendChild(editar);
+        containerAcoes.appendChild(excluir);
+
+        celulaAcoes.appendChild(containerAcoes);
 
         linha.appendChild(celulaAcoes);
 
