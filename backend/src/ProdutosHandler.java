@@ -83,10 +83,17 @@ public class ProdutosHandler implements HttpHandler {
             return;
         }
 
-        if (caminho.equals("/api/produtos")
-                && metodo.equals("POST")) {
-            cadastrarProduto(requisicao);
-            return;
+        if (caminho.equals("/api/produtos")) {
+
+            if (metodo.equals("GET")) {
+                listarProdutos(requisicao);
+                return;
+            }
+
+            if (metodo.equals("POST")) {
+                cadastrarProduto(requisicao);
+                return;
+            }
         }
 
         responder(requisicao, 405, "Operacao nao permitida.");
@@ -311,6 +318,100 @@ public class ProdutosHandler implements HttpHandler {
             );
         }
     }
+
+    
+    // Lista todos os produtos cadastrados no MongoDB.
+    private void listarProdutos(HttpExchange requisicao)
+            throws IOException {
+
+        try {
+
+            List<Document> listaProdutos = new ArrayList<>();
+
+            // Busca os produtos da colecao itens.
+            for (Document produto : itens.find()) {
+
+                String nomeCategoria = "Sem categoria";
+
+                // Recupera o ID da categoria do produto.
+                ObjectId categoriaId =
+                    produto.getObjectId("categoriaId");
+
+                // Busca o nome da categoria no MongoDB.
+                if (categoriaId != null) {
+
+                    Document categoria = categorias.find(
+                        eq("_id", categoriaId)
+                    ).first();
+
+                    if (categoria != null) {
+                        nomeCategoria = categoria.getString("nome");
+                    }
+                }
+
+                // Prepara as informacoes do produto.
+                Document resultado = new Document()
+                    .append(
+                        "id",
+                        produto.getObjectId("_id").toHexString()
+                    )
+                    .append(
+                        "nome",
+                        produto.getString("nome")
+                    )
+                    .append(
+                        "categoria",
+                        nomeCategoria
+                    )
+                    .append(
+                        "unidadeMedida",
+                        produto.getString("unidadeMedida")
+                    )
+                    .append(
+                        "status",
+                        produto.getString("status")
+                    )
+                    .append(
+                        "observacao",
+                        produto.getString("observacao")
+                    );
+
+                listaProdutos.add(resultado);
+            }
+
+            // Retorna os produtos em formato JSON.
+            responderJSON(
+                requisicao,
+                200,
+                new Document("produtos", listaProdutos)
+            );
+
+        } catch (MongoException erro) {
+
+            System.err.println(
+                "Erro ao listar produtos: " + erro.getMessage()
+            );
+
+            responder(
+                requisicao,
+                500,
+                "Erro ao buscar produtos."
+            );
+
+        } catch (RuntimeException erro) {
+
+            System.err.println(
+                "Erro ao processar produtos: " + erro.getMessage()
+            );
+
+            responder(
+                requisicao,
+                500,
+                "Erro interno ao listar produtos."
+            );
+        }
+    }
+
 
     private static String obterTexto(
         Document dados,
