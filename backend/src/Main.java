@@ -74,7 +74,7 @@ public class Main {
             // ROTAS DE PRODUTOS E CATEGORIAS
             // =================================================
 
-            // Construtor atualizado pelos colegas
+// Handler compartilhado de produtos, categorias e lotes
             ProdutosHandler produtosHandler =
                     new ProdutosHandler(
                             produtos,
@@ -126,6 +126,21 @@ public class Main {
             // ENCERRAMENTO DO SERVIDOR
             // =================================================
 
+// =================================================
+// ROTA DE CADASTRO E CONSULTA DE LOTES
+// =================================================
+
+LotesHandler lotesHandler =
+        new LotesHandler(lotes, produtos);
+
+servidor.createContext(
+        "/api/lotes",
+        lotesHandler
+);
+
+// =================================================
+// ENCERRAMENTO DO SERVIDOR
+// =================================================
             Runtime.getRuntime().addShutdownHook(
                     new Thread(() -> {
 
