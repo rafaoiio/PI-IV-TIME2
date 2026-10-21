@@ -52,7 +52,7 @@
 								<span class="text-red-600">*</span>
 							</label>
 
-							<input type="text" id="nomeProduto" name="nomeProduto" placeholder="Ex.: Leite Integral 1L"
+							<input type="text" id="nomeProduto" name="nomeProduto" placeholder="Ex.: Leite Integral "
 								required
 								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
 						</div>
@@ -78,22 +78,41 @@
 						<!-- UNIDADE DE MEDIDA -->
 						<div class="flex flex-col">
 
-							<label for="unidadeMedida" class="mb-2 text-xs font-medium text-text">
+							<label class="mb-2 text-xs font-medium text-text">
 								Unidade de Medida
 								<span class="text-red-600">*</span>
 							</label>
 
-							<select id="unidadeMedida" name="unidadeMedida" required
-								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
-								<option value="">
-									Selecione a Unidade
-								</option>
-								<option value="kg">Quilograma (kg)</option>
-								<option value="g">Grama (g)</option>
-								<option value="l">Litro (L)</option>
-								<option value="ml">Mililitro (ml)</option>
-								<option value="un">Unidade (un)</option>
-							</select>
+							<div class="flex gap-2">
+
+								<input
+									type="number"
+									id="quantidadeUnidade"
+									name="quantidadeUnidade"
+									placeholder="Ex.: 1"
+									min="0.001"
+									step="0.001"
+									required
+									class="h-[28px] w-[120px] rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"
+								>
+
+								<select
+									id="unidadeMedida"
+									name="unidadeMedida"
+									required
+									class="h-[28px] flex-1 rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"
+								>
+									<option value="">
+										Selecione a Unidade
+									</option>
+									<option value="kg">Quilograma (kg)</option>
+									<option value="g">Grama (g)</option>
+									<option value="l">Litro (L)</option>
+									<option value="ml">Mililitro (ml)</option>
+									<option value="un">Unidade (un)</option>
+								</select>
+
+							</div>
 						</div>
 
 						<!-- STATUS -->
