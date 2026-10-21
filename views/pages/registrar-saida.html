@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -38,7 +39,6 @@
           </span>
         </div>
 
-
         <!-- Card -->
         <section
           class="w-full rounded-md bg-gray-200 px-6 py-5"
@@ -50,8 +50,7 @@
             Registrar Saída
           </h1>
 
-
-          <form>
+          <form id="form-registrar-saida">
 
             <!-- Produto e lote -->
             <div
@@ -79,11 +78,10 @@
                     Selecione um produto cadastrado
                   </option>
 
-                  <!-- Produtos serão carregados do banco de dados -->
+                  <!-- Produtos carregados do banco de dados -->
                 </select>
 
               </div>
-
 
               <!-- Lote -->
               <div class="flex flex-col">
@@ -106,13 +104,12 @@
                     Selecione um lote disponível
                   </option>
 
-                  <!-- Lotes com saldo do produto selecionado serão carregados do banco de dados -->
+                  <!-- Lotes do produto selecionado carregados do banco -->
                 </select>
 
               </div>
 
             </div>
-
 
             <!-- Quantidades e data da saída -->
             <div class="mt-6 grid grid-cols-1 gap-8 md:grid-cols-3">
@@ -132,13 +129,13 @@
                   id="quantidade-disponivel"
                   name="quantidade-disponivel"
                   type="text"
-                  placeholder="ex. 5 ou 5kg"
+                  placeholder="Selecione um lote"
+                  readonly
                   required
                   class="h-[28px] w-full rounded border border-gray-400 bg-primary-light px-3 text-[10px] text-text outline-none"
                 >
 
               </div>
-
 
               <!-- Quantidade de saída -->
               <div class="flex flex-col">
@@ -155,13 +152,12 @@
                   id="quantidade-saida"
                   name="quantidade-saida"
                   type="text"
-                  placeholder="ex. 5"
+                  placeholder="Ex.: 5"
                   required
                   class="h-[28px] w-full rounded border border-gray-400 bg-primary-light px-3 text-[10px] text-text outline-none"
                 >
 
               </div>
-
 
               <!-- Data da saída -->
               <div class="flex flex-col">
@@ -186,7 +182,6 @@
 
             </div>
 
-
             <!-- Motivo -->
             <div class="mt-5 w-[31%]">
 
@@ -204,7 +199,7 @@
                 required
                 class="h-[52px] w-full rounded border border-gray-400 bg-primary-light px-3 text-[10px] text-text outline-none"
               >
-                <option value="" selected>
+                <option value="" selected disabled>
                   Selecione
                 </option>
 
@@ -231,7 +226,6 @@
 
             </div>
 
-
             <!-- Observação -->
             <div class="mt-6">
 
@@ -253,7 +247,6 @@
 
             </div>
 
-
             <!-- Botões -->
             <div
               class="mt-7 flex justify-end gap-3"
@@ -265,7 +258,6 @@
               >
                 Cancelar
               </button>
-
 
               <button
                 type="submit"
@@ -288,7 +280,11 @@
 
   </div>
 
+  <!-- Componentes compartilhados -->
   <script src="/public/js/load-partials.js"></script>
+
+  <!-- Integração da Tela 7 com o backend -->
+  <script src="/public/js/registrar-saida.js"></script>
 
 </body>
 

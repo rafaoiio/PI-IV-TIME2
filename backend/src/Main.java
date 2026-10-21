@@ -1,7 +1,6 @@
 
 import com.sun.net.httpserver.HttpServer;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import com.mongodb.client.MongoClient;
@@ -56,6 +55,10 @@ public class Main {
             MongoCollection<Document> produtos = banco.getCollection("itens");
             MongoCollection<Document> lotes = banco.getCollection("lotes");
 
+            // Colecao de movimentacoes - Tela 7
+            MongoCollection<Document> movimentacoes =
+                    banco.getCollection("movimentacoes");
+
             // Rota de resumo do Dashboard
             servidor.createContext(
                     "/api/dashboard/resumo",
@@ -95,10 +98,20 @@ public class Main {
                 lotesHandler
             );
 
-            // Rota de proximos vencimentos - Laura
+            // Rota de proximos vencimentos - Tela 6
             servidor.createContext(
                 "/api/lotes/proximos-vencimento",
                 new ProximosVencimentoHandler(lotes, produtos)
+            );
+
+            // Rota de registro de saidas e desperdicios - Tela 7
+            servidor.createContext(
+                "/api/movimentacoes",
+                new MovimentacoesHandler(
+                    cliente,
+                    lotes,
+                    movimentacoes
+                )
             );
 
             // Fecha recursos quando o servidor parar
