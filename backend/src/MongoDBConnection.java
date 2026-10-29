@@ -23,58 +23,48 @@ public class MongoDBConnection {
         if (!Files.isRegularFile(caminho)) {
 
             caminho = Path.of(
-                "backend",
-                "config.properties"
-            );
+                    "backend",
+                    "config.properties");
 
         }
 
         if (!Files.isRegularFile(caminho)) {
 
             throw new IllegalStateException(
-                "Arquivo config.properties não encontrado."
-            );
+                    "Arquivo config.properties não encontrado.");
 
         }
-
 
         // Lê as propriedades do arquivo.
 
         Properties propriedades = new Properties();
 
         try (
-            Reader leitor = Files.newBufferedReader(
-                caminho,
-                StandardCharsets.UTF_8
-            )
-        ) {
+                Reader leitor = Files.newBufferedReader(
+                        caminho,
+                        StandardCharsets.UTF_8)) {
 
             propriedades.load(leitor);
 
         } catch (IOException erro) {
 
             throw new IllegalStateException(
-                "Erro ao ler config.properties.",
-                erro
-            );
+                    "Erro ao ler config.properties.",
+                    erro);
 
         }
-
 
         // Recupera a URI do MongoDB.
 
         String uri = propriedades.getProperty(
-            "mongodb.uri"
-        );
+                "MONGO_URI");
 
         if (uri == null || uri.isBlank()) {
 
             throw new IllegalStateException(
-                "A propriedade mongodb.uri não foi configurada."
-            );
+                    "A propriedade MONGO_URI não foi configurada.");
 
         }
-
 
         // Cria o cliente MongoDB.
         // A conexão será verificada quando
@@ -85,4 +75,3 @@ public class MongoDBConnection {
     }
 
 }
-
