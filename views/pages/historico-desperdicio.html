@@ -1,16 +1,25 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Histórico de Desperdício | PsicomManager</title>
 
-  <link rel="stylesheet" href="../../public/css/style.css">
+  <link
+    rel="stylesheet"
+    href="../../public/css/style.css"
+  >
 </head>
 
 <body class="flex min-h-screen flex-col bg-background md:flex-row">
 
+  <!-- Menu lateral -->
   <aside
     id="aside-placeholder"
     class="w-full shrink-0 md:w-[180px]"
@@ -18,13 +27,16 @@
 
   <div class="flex min-w-0 flex-1 flex-col">
 
+    <!-- Cabeçalho compartilhado -->
     <div id="header-placeholder"></div>
 
     <main class="flex-1">
+
       <div class="w-full px-8 py-8">
 
         <!-- Breadcrumb -->
         <div class="mb-10 text-[14px] text-text-secondary">
+
           <span class="text-gray-500">
             Desperdício
           </span>
@@ -36,9 +48,10 @@
           <span class="font-medium text-text">
             Histórico
           </span>
+
         </div>
 
-        <!-- Card -->
+        <!-- Card principal -->
         <section
           class="
             w-full
@@ -46,11 +59,12 @@
             rounded-[8px]
             bg-[#F1F1F1]
             shadow-sm
-            "
+          "
         >
 
           <!-- Título do card -->
           <div class="px-6 py-4">
+
             <h1
               class="
                 text-[18px]
@@ -60,9 +74,10 @@
             >
               Histórico
             </h1>
+
           </div>
 
-          <!-- Tabela -->
+          <!-- Tabela do histórico -->
           <div class="overflow-x-auto">
 
             <table
@@ -74,7 +89,9 @@
               "
             >
 
+              <!-- Cabeçalho da tabela -->
               <thead>
+
                 <tr
                   class="
                     border-b
@@ -84,6 +101,7 @@
                     text-text
                   "
                 >
+
                   <th class="px-6 py-2 font-normal">
                     Produto
                   </th>
@@ -103,38 +121,25 @@
                   <th class="px-6 py-2 text-center font-normal">
                     Registrado por
                   </th>
+
                 </tr>
+
               </thead>
 
+              <!--
+                Os registros serão inseridos automaticamente
+                pelo JavaScript historico-desperdicio.js.
+
+                Nenhum registro fictício deve ficar aqui.
+              -->
               <tbody id="historico-desperdicio">
 
-                <!-- Exemplo de registro -->
-                <tr
-                  class="
-                    bg-[#E4E5E5]
-                    text-[14px]
-                    font-semibold
-                    text-text
-                  "
-                >
-                  <td class="px-6 py-2">
-                    Leite
-                  </td>
-
-                  <td class="px-6 py-2 text-center">
-                    10 uni.
-                  </td>
-
-                  <td class="px-6 py-2 text-center">
-                    Vencimento
-                  </td>
-
-                  <td class="px-6 py-2 text-center">
-                    10/09/2026
-                  </td>
-
-                  <td class="px-6 py-2 text-center">
-                    Fulano
+                <tr>
+                  <td
+                    colspan="5"
+                    class="px-6 py-6 text-center text-text-secondary"
+                  >
+                    Carregando histórico...
                   </td>
                 </tr>
 
@@ -147,13 +152,20 @@
         </section>
 
       </div>
+
     </main>
 
+    <!-- Rodapé compartilhado -->
     <div id="footer-placeholder"></div>
 
   </div>
 
+  <!-- Componentes compartilhados -->
   <script src="../../public/js/load-partials.js"></script>
 
+  <!-- Integração com o backend do Histórico de Desperdício -->
+  <script src="../../public/js/historico-desperdicio.js"></script>
+
 </body>
+
 </html>
