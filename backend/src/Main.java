@@ -18,112 +18,111 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        // Conecta ao MongoDB Atlas
         MongoClient cliente = MongoDBConnection.conectar();
 
         try {
 
-            // Seleciona o banco
             MongoDatabase banco = cliente.getDatabase(
                     "desperdicio_alimentos");
 
-            // Verifica a conexão
-            banco.runCommand(
-                    new Document("ping", 1));
+            banco.runCommand(new Document("ping", 1));
 
-            // Seleciona a collection users
-            MongoCollection<Document> usuarios = banco.getCollection("users");
+            MongoCollection<Document> usuarios =
+                    banco.getCollection("users");
 
-            // Impede e-mails duplicados
+            MongoCollection<Document> sessoes =
+                    banco.getCollection("sessoes");
+
             usuarios.createIndex(
                     Indexes.ascending("email"),
                     new IndexOptions().unique(true));
 
-            // Cria o servidor HTTP local
+            sessoes.createIndex(
+                    Indexes.ascending("token"),
+                    new IndexOptions().unique(true));
+
+            sessoes.createIndex(
+                    Indexes.ascending("expiraEm"),
+                    new IndexOptions().expireAfter(0L, java.util.concurrent.TimeUnit.SECONDS));
+
             HttpServer servidor = HttpServer.create(
-                    new InetSocketAddress(
-                            "127.0.0.1",
-                            8080),
+                    new InetSocketAddress("127.0.0.1", 8080),
                     0);
 
-            // Registra a rota de cadastro
             servidor.createContext(
                     "/api/usuarios",
                     new UsuariosHandler(usuarios));
 
-            // Colecao de produtos
-            MongoCollection<Document> produtos = banco.getCollection("itens");
-            MongoCollection<Document> lotes = banco.getCollection("lotes");
+            LoginHandler loginHandler =
+                    new LoginHandler(usuarios, sessoes);
 
-            // Colecao de movimentacoes - Tela 7
+            servidor.createContext(
+                    "/api/login",
+                    loginHandler);
+
+            servidor.createContext(
+                    "/api/logout",
+                    loginHandler);
+
+            servidor.createContext(
+                    "/api/usuario",
+                    loginHandler);
+
+            MongoCollection<Document> produtos =
+                    banco.getCollection("itens");
+
+            MongoCollection<Document> lotes =
+                    banco.getCollection("lotes");
+
             MongoCollection<Document> movimentacoes =
                     banco.getCollection("movimentacoes");
 
-            // Rota de resumo do Dashboard
             servidor.createContext(
                     "/api/dashboard/resumo",
-                    // passo como parâmetro o documento itens que está associado a variável produtos
                     new DashboardHandler(produtos, lotes));
 
-            // Rota de relatório de estoque por produto
             servidor.createContext(
                     "/api/relatorios/estoque-por-produto",
                     new RelatoriosHandler(produtos, lotes));
 
-            // Colecao de categorias
             MongoCollection<Document> categorias =
-                banco.getCollection("categorias");
+                    banco.getCollection("categorias");
 
-            // Handler compartilhado dos produtos, categorias e lotes
             ProdutosHandler produtosHandler =
-                new ProdutosHandler(produtos, categorias, lotes);
+                    new ProdutosHandler(produtos, categorias, lotes);
 
-            // Rota de cadastro dos produtos
             servidor.createContext(
                     "/api/produtos",
                     produtosHandler);
 
-            // Rota de consulta das categorias
             servidor.createContext(
                     "/api/categorias",
                     produtosHandler);
 
-            // Handler responsavel pelo cadastro dos lotes
             LotesHandler lotesHandler =
-                new LotesHandler(lotes, produtos);
+                    new LotesHandler(lotes, produtos);
 
-            // Registra a rota de cadastro dos lotes
             servidor.createContext(
-                "/api/lotes",
-                lotesHandler
-            );
+                    "/api/lotes",
+                    lotesHandler);
 
-            // Rota de proximos vencimentos - Tela 6
             servidor.createContext(
-                "/api/lotes/proximos-vencimento",
-                new ProximosVencimentoHandler(lotes, produtos)
-            );
+                    "/api/lotes/proximos-vencimento",
+                    new ProximosVencimentoHandler(lotes, produtos));
 
-            // Rota de registro de saidas e desperdicios - Tela 7
             servidor.createContext(
-                "/api/movimentacoes",
-                new MovimentacoesHandler(
-                    cliente,
-                    lotes,
-                    movimentacoes
-                )
-            );
+                    "/api/movimentacoes",
+                    new MovimentacoesHandler(
+                            cliente,
+                            lotes,
+                            movimentacoes));
 
-            // Fecha recursos quando o servidor parar
             Runtime.getRuntime().addShutdownHook(
                     new Thread(() -> {
-
                         servidor.stop(0);
                         cliente.close();
-
                     }));
 
-            // Inicia o servidor
             servidor.start();
 
             System.out.println(
@@ -132,13 +131,14 @@ public class Main {
             System.out.println(
                     "MongoDB conectado com sucesso!");
 
+            System.out.println(
+                    "Rotas de cadastro e login disponíveis!");
+
         } catch (Exception erro) {
 
             cliente.close();
             throw erro;
 
         }
-
     }
-
 }
