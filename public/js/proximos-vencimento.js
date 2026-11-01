@@ -9,14 +9,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const mensagem = document.getElementById("mensagem-vencimentos");
 
     let requisicaoAtual = null;
+    let modalAberto = null;
 
     // Formata uma data ISO para o formato brasileiro
     function formatarData(dataISO) {
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(dataISO || "")) {
+        const data = String(dataISO || "").substring(0, 10);
+
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) {
             return "-";
         }
 
-        const [ano, mes, dia] = dataISO.split("-");
+        const [ano, mes, dia] = data.split("-");
         return `${dia}/${mes}/${ano}`;
     }
 
@@ -33,6 +36,39 @@ document.addEventListener("DOMContentLoaded", () => {
         }).format(numero) + " " + (unidade || "");
     }
 
+    // Calcula os dias restantes usando o horário de São Paulo
+    function calcularDiasRestantes(dataISO) {
+        const data = String(dataISO || "").substring(0, 10);
+
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) {
+            return null;
+        }
+
+        const [ano, mes, dia] = data.split("-").map(Number);
+
+        const destino = Date.UTC(ano, mes - 1, dia);
+
+        const partes = new Intl.DateTimeFormat("en-US", {
+            timeZone: "America/Sao_Paulo",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        }).formatToParts(new Date());
+
+        const obter = (tipo) =>
+            Number(partes.find((parte) => parte.type === tipo).value);
+
+        const hoje = Date.UTC(
+            obter("year"),
+            obter("month") - 1,
+            obter("day")
+        );
+
+        return Math.round(
+            (destino - hoje) / (24 * 60 * 60 * 1000)
+        );
+    }
+
     // Exibe mensagens de carregamento e erro
     function mostrarMensagem(texto) {
         mensagem.textContent = texto;
@@ -43,6 +79,310 @@ document.addEventListener("DOMContentLoaded", () => {
     function esconderMensagem() {
         mensagem.classList.add("hidden");
         mensagem.hidden = true;
+    }
+
+    // Cria elementos de texto para o modal
+    function criarTexto(tag, texto, estilos = {}) {
+        const elemento = document.createElement(tag);
+        elemento.textContent = texto;
+        Object.assign(elemento.style, estilos);
+        return elemento;
+    }
+
+    // Abre o modal de detalhes do lote
+    function abrirModalDetalhes(lote, botaoOrigem) {
+
+        // Impede que dois modais fiquem abertos.
+        if (modalAberto) {
+            modalAberto.fechar();
+        }
+
+        const diasRestantes = calcularDiasRestantes(
+            lote.dataValidade
+        );
+
+        let situacao = "Data não disponível";
+        let corSituacao = "#64748b";
+        let fundoSituacao = "#f1f5f9";
+
+        if (diasRestantes !== null) {
+            if (diasRestantes < 0) {
+                situacao =
+                    `Vencido há ${Math.abs(diasRestantes)} dia(s)`;
+                corSituacao = "#b91c1c";
+                fundoSituacao = "#fee2e2";
+            } else if (diasRestantes === 0) {
+                situacao = "Vence hoje";
+                corSituacao = "#b91c1c";
+                fundoSituacao = "#fee2e2";
+            } else if (diasRestantes <= 3) {
+                situacao =
+                    `Vence em ${diasRestantes} dia(s)`;
+                corSituacao = "#92400e";
+                fundoSituacao = "#fef3c7";
+            } else {
+                situacao =
+                    `Vence em ${diasRestantes} dia(s)`;
+                corSituacao = "#166534";
+                fundoSituacao = "#dcfce7";
+            }
+        }
+
+        // Fundo escurecido
+        const overlay = document.createElement("div");
+
+        Object.assign(overlay.style, {
+            position: "fixed",
+            inset: "0",
+            backgroundColor: "rgba(15, 23, 42, 0.55)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+            zIndex: "9999"
+        });
+
+        // Janela central
+        const modal = document.createElement("section");
+        modal.setAttribute("role", "dialog");
+        modal.setAttribute("aria-modal", "true");
+
+        Object.assign(modal.style, {
+            backgroundColor: "#ffffff",
+            width: "100%",
+            maxWidth: "480px",
+            borderRadius: "12px",
+            padding: "28px",
+            boxShadow: "0 20px 50px rgba(0, 0, 0, 0.2)",
+            position: "relative",
+            maxHeight: "90vh",
+            overflowY: "auto",
+            color: "#1f2937"
+        });
+
+        // Cabeçalho
+        const cabecalho = document.createElement("div");
+
+        Object.assign(cabecalho.style, {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: "16px",
+            marginBottom: "10px"
+        });
+
+        const titulo = criarTexto(
+            "h2",
+            "Detalhes do lote",
+            {
+                fontSize: "21px",
+                fontWeight: "700",
+                margin: "0"
+            }
+        );
+
+        const tituloId = "titulo-modal-vencimento";
+        titulo.id = tituloId;
+        modal.setAttribute("aria-labelledby", tituloId);
+
+        const botaoX = document.createElement("button");
+        botaoX.type = "button";
+        botaoX.textContent = "×";
+        botaoX.setAttribute("aria-label", "Fechar detalhes");
+
+        Object.assign(botaoX.style, {
+            border: "none",
+            background: "transparent",
+            cursor: "pointer",
+            fontSize: "29px",
+            lineHeight: "1",
+            color: "#64748b"
+        });
+
+        cabecalho.append(titulo, botaoX);
+
+        const descricao = criarTexto(
+            "p",
+            "Informações do produto próximo ao vencimento.",
+            {
+                fontSize: "13px",
+                color: "#64748b",
+                marginBottom: "22px"
+            }
+        );
+
+        // Situação do vencimento
+        const selo = criarTexto("span", situacao, {
+            display: "inline-block",
+            backgroundColor: fundoSituacao,
+            color: corSituacao,
+            padding: "8px 13px",
+            borderRadius: "20px",
+            fontSize: "13px",
+            fontWeight: "700",
+            marginBottom: "22px"
+        });
+
+        // Área com as informações
+        const informacoes = document.createElement("div");
+
+        Object.assign(informacoes.style, {
+            backgroundColor: "#f8fafc",
+            border: "1px solid #e2e8f0",
+            borderRadius: "8px",
+            padding: "8px 18px",
+            marginBottom: "24px"
+        });
+
+        function adicionarCampo(rotulo, valor) {
+            const campo = document.createElement("div");
+
+            Object.assign(campo.style, {
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "16px",
+                padding: "13px 0",
+                borderBottom: "1px solid #e2e8f0"
+            });
+
+            const label = criarTexto("span", rotulo, {
+                color: "#64748b",
+                fontSize: "14px"
+            });
+
+            const conteudo = criarTexto(
+                "strong",
+                valor ?? "-",
+                {
+                    fontSize: "14px",
+                    textAlign: "right",
+                    overflowWrap: "anywhere"
+                }
+            );
+
+            campo.append(label, conteudo);
+            informacoes.appendChild(campo);
+        }
+
+        adicionarCampo(
+            "Produto",
+            lote.produtoNome || "Produto sem nome"
+        );
+
+        adicionarCampo(
+            "Código do lote",
+            lote.codigo || "-"
+        );
+
+        adicionarCampo(
+            "Quantidade disponível",
+            formatarQuantidade(
+                lote.quantidadeDisponivel,
+                lote.unidadeMedida
+            )
+        );
+
+        adicionarCampo(
+            "Data de validade",
+            formatarData(lote.dataValidade)
+        );
+
+        adicionarCampo(
+            "Situação",
+            situacao
+        );
+
+        // Botão principal
+        const rodape = document.createElement("div");
+
+        Object.assign(rodape.style, {
+            display: "flex",
+            justifyContent: "flex-end"
+        });
+
+        const botaoFechar = document.createElement("button");
+        botaoFechar.type = "button";
+        botaoFechar.textContent = "Fechar";
+
+        Object.assign(botaoFechar.style, {
+            backgroundColor: "#334155",
+            color: "#ffffff",
+            border: "none",
+            borderRadius: "7px",
+            padding: "11px 26px",
+            fontSize: "14px",
+            fontWeight: "600",
+            cursor: "pointer"
+        });
+
+        rodape.appendChild(botaoFechar);
+
+        modal.append(
+            cabecalho,
+            descricao,
+            selo,
+            informacoes,
+            rodape
+        );
+
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        const overflowAnterior = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+
+        function fechar() {
+            document.removeEventListener(
+                "keydown",
+                tratarTeclado
+            );
+
+            overlay.remove();
+            document.body.style.overflow = overflowAnterior;
+            modalAberto = null;
+
+            if (botaoOrigem && botaoOrigem.isConnected) {
+                botaoOrigem.focus();
+            }
+        }
+
+        function tratarTeclado(evento) {
+            if (evento.key === "Escape") {
+                fechar();
+            }
+
+            if (evento.key === "Tab") {
+                const controles = [botaoX, botaoFechar];
+                const primeiro = controles[0];
+                const ultimo = controles[controles.length - 1];
+
+                if (evento.shiftKey &&
+                    document.activeElement === primeiro) {
+                    evento.preventDefault();
+                    ultimo.focus();
+                } else if (
+                    !evento.shiftKey &&
+                    document.activeElement === ultimo
+                ) {
+                    evento.preventDefault();
+                    primeiro.focus();
+                }
+            }
+        }
+
+        botaoX.addEventListener("click", fechar);
+        botaoFechar.addEventListener("click", fechar);
+
+        overlay.addEventListener("click", (evento) => {
+            if (evento.target === overlay) {
+                fechar();
+            }
+        });
+
+        document.addEventListener("keydown", tratarTeclado);
+
+        modalAberto = { fechar };
+        botaoX.focus();
     }
 
     // Cria uma linha da tabela usando os dados da API
@@ -85,20 +425,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const detalhes = document.createElement("button");
         detalhes.type = "button";
         detalhes.textContent = "Detalhes";
+
         detalhes.className =
             "cursor-pointer px-2 py-1 text-xs " +
             "font-semibold text-primary hover:underline";
 
         detalhes.addEventListener("click", () => {
-            alert(
-                "Produto: " + lote.produtoNome + "\n" +
-                "Lote: " + lote.codigo + "\n" +
-                "Quantidade: " + formatarQuantidade(
-                    lote.quantidadeDisponivel,
-                    lote.unidadeMedida
-                ) + "\n" +
-                "Validade: " + formatarData(lote.dataValidade)
-            );
+            abrirModalDetalhes(lote, detalhes);
         });
 
         acoes.appendChild(detalhes);
@@ -107,7 +440,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return linha;
     }
 
-    // Atualiza a aparência dos botões
+    // Atualiza a aparência dos botões de filtro
     function selecionarFiltro(botaoAtivo) {
         botoes.forEach((botao) => {
             botao.classList.remove(
