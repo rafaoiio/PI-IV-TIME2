@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Registrar desperdício</title>
+
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<body class="flex min-h-screen bg-background">
+
+  <aside
+    id="aside-placeholder"
+    class="w-[180px] shrink-0"
+  ></aside>
+
+  <div class="flex min-w-0 flex-1 flex-col">
+
+    <div id="header-placeholder"></div>
+
+    <main class="flex-1">
+
+      <div class="w-full px-6 pt-8">
+
+        <!-- Breadcrumb -->
+        <div
+          class="mb-8 flex min-h-[35px] items-center text-base"
+        >
+          <span class="text-text-secondary">
+            Desperdício
+          </span>
+
+          <span class="ml-1 font-semibold text-text">
+            / Registrar
+          </span>
+        </div>
+
+
+        <!-- Card -->
+        <section
+          class="w-full rounded-md bg-gray-200 px-6 py-5"
+        >
+
+          <h1
+            class="mb-9 text-base font-semibold text-text"
+          >
+            Registrar Desperdício
+          </h1>
+
+
+          <form>
+
+            <!-- Primeira linha -->
+            <div
+              class="grid grid-cols-[2.2fr_1fr_1fr_1.8fr] gap-8"
+            >
+
+              <!-- Produto -->
+              <div class="flex flex-col">
+
+                <label
+                  for="produto"
+                  class="mb-2 whitespace-nowrap text-xs font-medium text-text"
+                >
+                  Produto
+                  <span class="text-red-600">*</span>
+                </label>
+
+                <input
+                  id="produto"
+                  name="produto"
+                  type="text"
+                  placeholder="Digite aqui"
+                  required
+                  class="h-[28px] w-full rounded border border-gray-400 bg-primary-light px-3 text-[11px] text-text outline-none"
+                >
+
+              </div>
+
+
+              <!-- Quantidade disponível -->
+              <div class="flex flex-col">
+
+                <label
+                  for="quantidade-disponivel"
+                  class="mb-2 whitespace-nowrap text-xs font-medium text-text"
+                >
+                  Qtd. disponível
+                  <span class="text-red-600">*</span>
+                </label>
+
+                <input
+                  id="quantidade-disponivel"
+                  name="quantidade-disponivel"
+                  type="text"
+                  placeholder="ex. 5 ou 5kg"
+                  required
+                  class="h-[28px] w-full rounded border border-gray-400 bg-primary-light px-3 text-[10px] text-text outline-none"
+                >
+
+              </div>
+
+
+              <!-- Quantidade desperdiçada -->
+              <div class="flex flex-col">
+
+                <label
+                  for="quantidade-desperdicada"
+                  class="mb-2 whitespace-nowrap text-xs font-medium text-text"
+                >
+                  Qtd. desperdiçada
+                  <span class="text-red-600">*</span>
+                </label>
+
+                <input
+                  id="quantidade-desperdicada"
+                  name="quantidade-desperdicada"
+                  type="text"
+                  placeholder="ex. 5"
+                  required
+                  class="h-[28px] w-full rounded border border-gray-400 bg-primary-light px-3 text-[10px] text-text outline-none"
+                >
+
+              </div>
+
+
+              <!-- Data -->
+              <div class="flex flex-col">
+
+                <label
+                  for="data-vencimento"
+                  class="mb-2 whitespace-nowrap text-xs font-medium text-text"
+                >
+                  Data Vencimento
+                  <span class="text-red-600">*</span>
+                </label>
+
+                <input
+                  id="data-vencimento"
+                  name="data-vencimento"
+                  type="text"
+                  placeholder="ex. 29/09/2027"
+                  required
+                  class="h-[28px] w-full rounded border border-gray-400 bg-primary-light px-3 text-[10px] text-text outline-none"
+                >
+
+              </div>
+
+            </div>
+
+
+            <!-- Motivo -->
+            <div class="mt-5 w-[31%]">
+
+              <label
+                for="motivo"
+                class="mb-2 block text-xs font-medium text-text"
+              >
+                Motivo
+                <span class="text-red-600">*</span>
+              </label>
+
+              <select
+                id="motivo"
+                name="motivo"
+                required
+                class="h-[52px] w-full rounded border border-gray-400 bg-primary-light px-3 text-[10px] text-text outline-none"
+              >
+                <option value="" selected>
+                  Selecione
+                </option>
+
+                <option value="vencimento">
+                  Vencimento
+                </option>
+
+                <option value="contaminado">
+                  Contaminado
+                </option>
+
+                <option value="danificado">
+                  Danificado
+                </option>
+
+                <option value="outro">
+                  Outro
+                </option>
+              </select>
+
+            </div>
+
+
+            <!-- Observação -->
+            <div class="mt-6">
+
+              <label
+                for="observacao"
+                class="mb-2 block text-xs font-medium text-text"
+              >
+                Observação
+                <span class="text-red-600">*</span>
+              </label>
+
+              <textarea
+                id="observacao"
+                name="observacao"
+                placeholder="Digite aqui"
+                required
+                class="h-[84px] w-full resize-none rounded border border-gray-400 bg-primary-light px-3 py-2 text-[10px] text-text outline-none"
+              ></textarea>
+
+            </div>
+
+
+            <!-- Botões -->
+            <div
+              class="mt-7 flex justify-end gap-3"
+            >
+
+              <button
+                type="button"
+                class="flex h-[28px] w-[92px] cursor-pointer items-center justify-center rounded bg-primary-dark text-[10px] font-semibold text-white"
+              >
+                Cancelar
+              </button>
+
+
+              <button
+                type="submit"
+                class="flex h-[28px] w-[108px] cursor-pointer items-center justify-center rounded bg-gray-200 text-[9px] font-medium text-text"
+              >
+                Registrar Desperdício
+              </button>
+
+            </div>
+
+          </form>
+
+        </section>
+
+      </div>
+
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+  </div>
+
+  <script src="/public/js/load-partials.js"></script>
+
+</body>
+
+</html>
