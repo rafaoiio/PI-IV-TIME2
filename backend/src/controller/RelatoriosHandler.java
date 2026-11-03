@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class RelatoriosHandler implements HttpHandler {
 
@@ -23,8 +24,9 @@ public class RelatoriosHandler implements HttpHandler {
             "http://localhost:5500",
             "http://127.0.0.1:5500");
 
-    public RelatoriosHandler(MongoCollection<Document> itens, MongoCollection<Document> lotes) {
-        this.relatoriosService = new RelatoriosService(itens, lotes);
+    public RelatoriosHandler(MongoCollection<Document> itens, MongoCollection<Document> lotes,
+            MongoCollection<Document> movimentacoes) {
+        this.relatoriosService = new RelatoriosService(itens, lotes, movimentacoes);
     }
 
     @Override
@@ -56,7 +58,17 @@ public class RelatoriosHandler implements HttpHandler {
         String metodo = requisicao.getRequestMethod();
         String caminho = requisicao.getRequestURI().getPath();
 
-        if (!caminho.equals("/api/relatorios/estoque-por-produto")) {
+        Supplier<Document> consulta = switch (caminho) {
+            case "/api/relatorios/estoque-por-produto" ->
+                relatoriosService::consultarEstoquePorProduto;
+            case "/api/relatorios/desperdicios/por-produto" ->
+                relatoriosService::consultarDesperdicioPorProduto;
+            case "/api/relatorios/desperdicios/por-motivo" ->
+                relatoriosService::consultaDesperdicioPorMotivo;
+            default -> null;
+        };
+
+        if (consulta == null) {
             responder(requisicao, 404, "Rota não encontrada.");
             return;
         }
@@ -75,20 +87,11 @@ public class RelatoriosHandler implements HttpHandler {
             return;
         }
 
-        consultarEstoquePorProduto(requisicao);
-    }
-
-    private void consultarEstoquePorProduto(HttpExchange requisicao)
-            throws IOException {
-
         try {
-            Document relatorio = relatoriosService.consultarEstoquePorProduto();
+            Document relatorio = consulta.get();
             responderJSON(requisicao, 200, relatorio);
-
-        } catch (MongoException erro) {
-            responder(
-                    requisicao, 500,
-                    "Erro ao acessar o banco de dados.");
+        } catch (MongoException e) {
+            responder(requisicao, 500, "Erro ao acessar o banco de Dados.");
         }
     }
 
