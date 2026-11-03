@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- ALTERE O NOME EM CADA PÁGINA -->
     <title>Cadastrar Lote | Sistema de Gestão e Redução de Desperdício</title>
 
     <link rel="stylesheet" href="../../public/css/style.css">
@@ -20,26 +19,22 @@
         <div id="header-placeholder"></div>
 
         <main class="flex-1">
-
             <div class="w-full px-6 pt-8">
 
-                <!-- CAMINHO DA PÁGINA -->
+                <!-- CAMINHO -->
                 <div class="mb-8 flex min-h-[35px] items-center text-base">
-
-                    <span class="text-text-secondary">
-                        Lotes
-                    </span>
-
-                    <span class="ml-1 font-semibold text-text">
+                    <span class="text-text-secondary">Lotes</span>
+                    <span id="caminhoPagina"
+                        class="ml-1 font-semibold text-text">
                         / Cadastrar Lote
                     </span>
-
                 </div>
 
-                <!-- CONTEÚDO DA PÁGINA -->
+                <!-- CARD -->
                 <section class="w-full rounded-md bg-white px-6 py-5">
 
-                    <h1 class="mb-9 text-base font-semibold text-text">
+                    <h1 id="tituloFormulario"
+                        class="mb-9 text-base font-semibold text-text">
                         Cadastrar novo lote
                     </h1>
 
@@ -50,74 +45,90 @@
                         <!-- PRODUTO -->
                         <div class="flex flex-col md:col-span-2">
 
-                            <label for="produto" class="mb-2 text-xs font-medium text-text">
+                            <label for="produto"
+                                class="mb-2 text-xs font-medium text-text">
                                 Produto
                                 <span class="text-red-600">*</span>
                             </label>
 
-                            <select id="produto" name="produto" required
+                            <select id="produto"
+                                name="produto"
+                                required
                                 class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
+
                                 <option value="">
-                                    Selecionar um produto cadastrado
+                                    Selecione um produto cadastrado
                                 </option>
-
-                                <!-- Produtos serão carregados do banco de dados -->
-
                             </select>
-
                         </div>
 
-                        <!-- CÓDIGO DO LOTE -->
+                        <!-- CÓDIGO -->
                         <div class="flex flex-col">
 
-                            <label for="codigoLote" class="mb-2 text-xs font-medium text-text">
+                            <label for="codigoLote"
+                                class="mb-2 text-xs font-medium text-text">
                                 Código do lote
                                 <span class="text-red-600">*</span>
                             </label>
 
-                            <input type="text" id="codigoLote" name="codigoLote" placeholder="Ex.: L001" required
+                            <input type="text"
+                                id="codigoLote"
+                                name="codigoLote"
+                                placeholder="Ex.: L001"
+                                maxlength="50"
+                                required
                                 class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
-
                         </div>
 
-                        <!-- QUANTIDADE RECEBIDA -->
+                        <!-- QUANTIDADE -->
                         <div class="flex flex-col">
 
-                            <label for="quantidadeRecebida" class="mb-2 text-xs font-medium text-text">
+                            <label for="quantidadeRecebida"
+                                class="mb-2 text-xs font-medium text-text">
                                 Quantidade recebida
                                 <span class="text-red-600">*</span>
                             </label>
 
-                            <input type="number" id="quantidadeRecebida" name="quantidadeRecebida" placeholder="Ex.: 30"
-                                min="0" step="any" required
+                            <input type="number"
+                                id="quantidadeRecebida"
+                                name="quantidadeRecebida"
+                                placeholder="Ex.: 30"
+                                min="0.001"
+                                step="any"
+                                required
                                 class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
-
                         </div>
 
-                        <!-- DATA DE ENTRADA -->
+                        <!-- ENTRADA -->
                         <div class="flex flex-col">
 
-                            <label for="dataEntrada" class="mb-2 text-xs font-medium text-text">
+                            <label for="dataEntrada"
+                                class="mb-2 text-xs font-medium text-text">
                                 Data de entrada
                                 <span class="text-red-600">*</span>
                             </label>
 
-                            <input type="date" id="dataEntrada" name="dataEntrada" required
+                            <input type="date"
+                                id="dataEntrada"
+                                name="dataEntrada"
+                                required
                                 class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
-
                         </div>
 
-                        <!-- DATA DE VALIDADE -->
+                        <!-- VALIDADE -->
                         <div class="flex flex-col">
 
-                            <label for="dataValidade" class="mb-2 text-xs font-medium text-text">
+                            <label for="dataValidade"
+                                class="mb-2 text-xs font-medium text-text">
                                 Data de validade
                                 <span class="text-red-600">*</span>
                             </label>
 
-                            <input type="date" id="dataValidade" name="dataValidade" required
+                            <input type="date"
+                                id="dataValidade"
+                                name="dataValidade"
+                                required
                                 class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
-
                         </div>
 
                         <!-- VALOR UNITÁRIO -->
@@ -129,20 +140,17 @@
                                 <span class="text-red-600">*</span>
                             </label>
 
-                            <input
-                                type="number"
+                            <input type="number"
                                 id="valorUnitario"
                                 name="valorUnitario"
                                 placeholder="Ex.: 5.00"
                                 min="0.01"
                                 step="0.01"
                                 required
-                                class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"
-                            >
-
+                                class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
                         </div>
 
-                        <!-- CUSTO TOTAL DE AQUISIÇÃO -->
+                        <!-- CUSTO TOTAL -->
                         <div class="flex flex-col">
 
                             <label for="custoTotalAquisicao"
@@ -151,63 +159,62 @@
                                 <span class="text-red-600">*</span>
                             </label>
 
-                            <input
-                                type="number"
+                            <input type="number"
                                 id="custoTotalAquisicao"
                                 name="custoTotalAquisicao"
                                 placeholder="Calculado automaticamente"
                                 step="0.01"
                                 readonly
-                                class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"
-                            >
-
+                                class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
                         </div>
-
 
                         <!-- OBSERVAÇÃO -->
                         <div class="flex flex-col md:col-span-2">
 
-                            <label for="observacao" class="mb-2 text-xs font-medium text-text">
+                            <label for="observacao"
+                                class="mb-2 text-xs font-medium text-text">
                                 Observação
                                 <span class="text-red-600">*</span>
                             </label>
 
-                            <textarea id="observacao" name="observacao" placeholder="Informações adicionais do lote"
+                            <textarea id="observacao"
+                                name="observacao"
+                                placeholder="Informações adicionais do lote"
+                                maxlength="1000"
                                 required
                                 class="h-[52px] w-full resize-none rounded border border-gray-400 bg-[#e9ebee] px-3 py-2 text-[11px] text-text outline-none"></textarea>
-
                         </div>
+
+                        <!-- MENSAGEM -->
+                        <p id="mensagemFormulario"
+                            class="hidden text-xs text-red-600 md:col-span-2"
+                            role="alert"></p>
 
                         <!-- BOTÕES -->
                         <div class="mt-7 flex justify-end gap-3 md:col-span-2">
 
-                            <button type="reset"
+                            <button id="botaoCancelar"
+                                type="button"
                                 class="flex h-[28px] w-[92px] cursor-pointer items-center justify-center rounded bg-primary-dark text-[10px] font-semibold text-white">
                                 Cancelar
                             </button>
 
-                            <button type="submit"
-                                class="flex h-[28px] w-[150px] cursor-pointer items-center justify-center rounded bg-gray-200 text-[10px] font-medium text-text">
+                            <button id="botaoSalvar"
+                                type="submit"
+                                class="flex h-[28px] w-[150px] cursor-pointer items-center justify-center rounded bg-gray-200 text-[10px] font-medium text-text disabled:opacity-50">
                                 Cadastrar novo lote
                             </button>
-
                         </div>
-
                     </form>
-
                 </section>
-
             </div>
-
         </main>
 
         <div id="footer-placeholder"></div>
-
     </div>
 
     <script src="../../public/js/load-partials.js"></script>
     <script src="../../public/js/cadastro-lotes.js"></script>
 
 </body>
-
 </html>

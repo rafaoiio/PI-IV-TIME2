@@ -2,175 +2,189 @@
 <html lang="pt-BR">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<!-- ALTERE O NOME EM CADA PÁGINA -->
-	<title>Cadastrar Produto | Sistema de Gestão e Redução de Desperdício</title>
+    <title>Cadastrar Produto | Sistema de Gestão e Redução de Desperdício</title>
 
-	<link rel="stylesheet" href="../../public/css/style.css">
+    <link rel="stylesheet" href="../../public/css/style.css">
 </head>
 
 <body class="flex min-h-screen bg-background">
 
-	<aside id="aside-placeholder" class="w-[180px] shrink-0"></aside>
+    <aside id="aside-placeholder" class="w-[180px] shrink-0"></aside>
 
-	<div class="flex min-w-0 flex-1 flex-col">
+    <div class="flex min-w-0 flex-1 flex-col">
 
-		<div id="header-placeholder"></div>
+        <div id="header-placeholder"></div>
 
-		<main class="flex-1">
+        <main class="flex-1">
+            <div class="w-full px-6 pt-8">
 
-			<div class="w-full px-6 pt-8">
+                <!-- CAMINHO -->
+                <div class="mb-8 flex min-h-[35px] items-center text-base">
+                    <span class="text-text-secondary">Produtos</span>
 
-				<!-- CAMINHO DA PÁGINA -->
-				<div class="mb-8 flex min-h-[35px] items-center text-base">
-					<span class="text-text-secondary">
-						Produtos
-					</span>
+                    <span id="caminhoPagina"
+                        class="ml-1 font-semibold text-text">
+                        / Cadastrar Produto
+                    </span>
+                </div>
 
-					<span class="ml-1 font-semibold text-text">
-						/ Cadastrar Produto
-					</span>
-				</div>
+                <!-- CARD -->
+                <section class="w-full rounded-md bg-white px-6 py-5">
 
-				<!-- CARD PRINCIPAL -->
-				<section class="w-full rounded-md bg-white px-6 py-5">
+                    <h1 id="tituloFormulario"
+                        class="mb-9 text-base font-semibold text-text">
+                        Cadastrar novo produto
+                    </h1>
 
-					<h1 class="mb-9 text-base font-semibold text-text">
-						Cadastrar novo produto
-					</h1>
+                    <!-- FORMULÁRIO -->
+                    <form id="formCadastroProduto"
+                        class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
 
-					<!-- FORMULÁRIO -->
-					<form id="formCadastroProduto" class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
+                        <!-- NOME -->
+                        <div class="flex flex-col">
+                            <label for="nomeProduto"
+                                class="mb-2 text-xs font-medium text-text">
+                                Nome do produto
+                                <span class="text-red-600">*</span>
+                            </label>
 
-						<!-- NOME DO PRODUTO -->
-						<div class="flex flex-col">
+                            <input
+                                type="text"
+                                id="nomeProduto"
+                                name="nomeProduto"
+                                placeholder="Ex.: Leite Integral"
+                                required
+                                class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
+                        </div>
 
-							<label for="nomeProduto" class="mb-2 text-xs font-medium text-text">
-								Nome do produto
-								<span class="text-red-600">*</span>
-							</label>
+                        <!-- CATEGORIA -->
+                        <div class="flex flex-col">
+                            <label for="categoria"
+                                class="mb-2 text-xs font-medium text-text">
+                                Categoria
+                                <span class="text-red-600">*</span>
+                            </label>
 
-							<input type="text" id="nomeProduto" name="nomeProduto" placeholder="Ex.: Leite Integral "
-								required
-								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
-						</div>
+                            <input
+                                type="text"
+                                id="categoria"
+                                name="categoria"
+                                list="listaCategorias"
+                                placeholder="Digite ou selecione uma categoria"
+                                autocomplete="off"
+                                maxlength="100"
+                                required
+                                class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
 
-						<!-- CATEGORIA -->
-						<div class="flex flex-col">
+                            <datalist id="listaCategorias"></datalist>
+                        </div>
 
-							<label for="categoria" class="mb-2 text-xs font-medium text-text">
-								Categoria
-								<span class="text-red-600">*</span>
-							</label>
+                        <!-- UNIDADE -->
+                        <div class="flex flex-col">
+                            <label for="quantidadeUnidade"
+                                class="mb-2 text-xs font-medium text-text">
+                                Unidade de Medida
+                                <span class="text-red-600">*</span>
+                            </label>
 
-							<input type="text" id="categoria" name="categoria" list="listaCategorias"
-								placeholder="Digite ou selecione uma categoria" autocomplete="off" maxlength="100"
-								required
-								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
+                            <div class="flex gap-2">
 
-							<!-- Categorias carregadas do MongoDB -->
-							<datalist id="listaCategorias"></datalist>
+                                <input
+                                    type="number"
+                                    id="quantidadeUnidade"
+                                    name="quantidadeUnidade"
+                                    placeholder="Ex.: 1"
+                                    min="0.001"
+                                    step="0.001"
+                                    required
+                                    class="h-[28px] w-[120px] rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
 
-						</div>
+                                <select
+                                    id="unidadeMedida"
+                                    name="unidadeMedida"
+                                    required
+                                    class="h-[28px] flex-1 rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
 
-						<!-- UNIDADE DE MEDIDA -->
-						<div class="flex flex-col">
+                                    <option value="">Selecione a Unidade</option>
+                                    <option value="kg">Quilograma (kg)</option>
+                                    <option value="g">Grama (g)</option>
+                                    <option value="l">Litro (L)</option>
+                                    <option value="ml">Mililitro (ml)</option>
+                                    <option value="un">Unidade (un)</option>
+                                </select>
+                            </div>
+                        </div>
 
-							<label class="mb-2 text-xs font-medium text-text">
-								Unidade de Medida
-								<span class="text-red-600">*</span>
-							</label>
+                        <!-- STATUS -->
+                        <div class="flex flex-col">
+                            <label for="status"
+                                class="mb-2 text-xs font-medium text-text">
+                                Status
+                                <span class="text-red-600">*</span>
+                            </label>
 
-							<div class="flex gap-2">
+                            <select
+                                id="status"
+                                name="status"
+                                required
+                                class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
 
-								<input
-									type="number"
-									id="quantidadeUnidade"
-									name="quantidadeUnidade"
-									placeholder="Ex.: 1"
-									min="0.001"
-									step="0.001"
-									required
-									class="h-[28px] w-[120px] rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"
-								>
+                                <option value="ativo">Ativo</option>
+                                <option value="inativo">Inativo</option>
+                            </select>
+                        </div>
 
-								<select
-									id="unidadeMedida"
-									name="unidadeMedida"
-									required
-									class="h-[28px] flex-1 rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"
-								>
-									<option value="">
-										Selecione a Unidade
-									</option>
-									<option value="kg">Quilograma (kg)</option>
-									<option value="g">Grama (g)</option>
-									<option value="l">Litro (L)</option>
-									<option value="ml">Mililitro (ml)</option>
-									<option value="un">Unidade (un)</option>
-								</select>
+                        <!-- OBSERVAÇÃO -->
+                        <div class="mt-4 flex flex-col md:col-span-2">
+                            <label for="observacao"
+                                class="mb-2 text-xs font-medium text-text">
+                                Observação
+                                <span class="text-red-600">*</span>
+                            </label>
 
-							</div>
-						</div>
+                            <textarea
+                                id="observacao"
+                                name="observacao"
+                                placeholder="Informações adicionais do produto"
+                                required
+                                class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"></textarea>
+                        </div>
 
-						<!-- STATUS -->
-						<div class="flex flex-col">
+                        <!-- ERRO -->
+                        <p id="mensagemFormulario"
+                            class="hidden text-xs text-red-600 md:col-span-2"
+                            role="alert"></p>
 
-							<label for="status" class="mb-2 text-xs font-medium text-text">
-								Status
-								<span class="text-red-600">*</span>
-							</label>
+                        <!-- BOTÕES -->
+                        <div class="mt-7 flex justify-end gap-3 md:col-span-2">
 
-							<select id="status" name="status" required
-								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none">
-								<option value="ativo">Ativo</option>
-								<option value="inativo">Inativo</option>
-							</select>
-						</div>
+                            <button
+                                id="botaoCancelar"
+                                type="button"
+                                class="flex h-[28px] w-[92px] cursor-pointer items-center justify-center rounded bg-primary-dark text-[10px] font-semibold text-white">
+                                Cancelar
+                            </button>
 
-						<!-- OBSERVAÇÃO -->
-						<div class="mt-4 flex flex-col md:col-span-2">
+                            <button
+                                id="botaoSalvar"
+                                type="submit"
+                                class="flex h-[28px] w-[150px] cursor-pointer items-center justify-center rounded bg-gray-200 text-[10px] font-medium text-text disabled:opacity-50">
+                                Cadastrar novo produto
+                            </button>
+                        </div>
 
-							<label for="observacao" class="mb-2 text-xs font-medium text-text">
-								Observação
-								<span class="text-red-600">*</span>
-							</label>
+                    </form>
+                </section>
+            </div>
+        </main>
 
-							<textarea id="observacao" name="observacao" placeholder="Informações adicionais do produto"
-								required
-								class="h-[28px] w-full rounded border border-gray-400 bg-[#e9ebee] px-3 text-[11px] text-text outline-none"></textarea>
-						</div>
+        <div id="footer-placeholder"></div>
+    </div>
 
-						<!-- BOTÕES -->
-						<div class="mt-7 flex justify-end gap-3 md:col-span-2">
-
-							<button type="button"
-								class="flex h-[28px] w-[92px] cursor-pointer items-center justify-center rounded bg-primary-dark text-[10px] font-semibold text-white">
-								Cancelar
-							</button>
-
-							<button type="submit"
-								class="flex h-[28px] w-[150px] cursor-pointer items-center justify-center rounded bg-gray-200 text-[10px] font-medium text-text">
-								Cadastrar novo produto
-							</button>
-
-						</div>
-
-					</form>
-
-				</section>
-
-			</div>
-
-		</main>
-
-		<div id="footer-placeholder"></div>
-	</div>
-
-	<script src="../../public/js/load-partials.js"></script>
-	<script src="../../public/js/cadastro-produtos.js"></script>
+    <script src="../../public/js/load-partials.js"></script>
+    <script src="../../public/js/cadastro-produtos.js"></script>
 </body>
-
 </html>
