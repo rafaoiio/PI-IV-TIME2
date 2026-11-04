@@ -1,4 +1,3 @@
-
 import com.sun.net.httpserver.HttpServer;
 
 import java.net.InetSocketAddress;
@@ -17,223 +16,108 @@ import controller.RelatoriosHandler;
 
 public class Main {
 
-    public static void main(String[] args) throws Exception {
+        public static void main(String[] args) throws Exception {
 
-        MongoClient cliente = MongoDBConnection.conectar();
-
-        try {
-
-            // CONEXÃO COM O BANCO
-            MongoDatabase banco = cliente.getDatabase(
-                    "desperdicio_alimentos");
-
-            banco.runCommand(new Document("ping", 1));
-
-            // COLEÇÕES DE USUÁRIOS
-            MongoCollection<Document> usuarios =
-                    banco.getCollection("users");
-
-            MongoCollection<Document> sessoes =
-                    banco.getCollection("sessoes");
-
-            // ÍNDICES
-            usuarios.createIndex(
-                    Indexes.ascending("email"),
-                    new IndexOptions().unique(true));
-
-            sessoes.createIndex(
-                    Indexes.ascending("token"),
-                    new IndexOptions().unique(true));
-
-            sessoes.createIndex(
-                    Indexes.ascending("expiraEm"),
-                    new IndexOptions().expireAfter(
-                            0L,
-                            TimeUnit.SECONDS));
-
-            // COLEÇÕES DO SISTEMA
-            MongoCollection<Document> produtos =
-                    banco.getCollection("itens");
-
-            MongoCollection<Document> lotes =
-                    banco.getCollection("lotes");
-
-            MongoCollection<Document> movimentacoes =
-                    banco.getCollection("movimentacoes");
-
-            MongoCollection<Document> categorias =
-                    banco.getCollection("categorias");
-
-            // INICIALIZAÇÃO DO SERVIDOR
-            HttpServer servidor = HttpServer.create(
-                    new InetSocketAddress("127.0.0.1", 8080),
-                    0);
-
-            // USUÁRIOS
-            servidor.createContext(
-                    "/api/usuarios",
-                    new UsuariosHandler(usuarios));
-
-            // LOGIN E SESSÃO
-            LoginHandler loginHandler =
-                    new LoginHandler(usuarios, sessoes);
-
-            servidor.createContext(
-                    "/api/login",
-                    loginHandler);
-
-            servidor.createContext(
-                    "/api/logout",
-                    loginHandler);
-
-            servidor.createContext(
-                    "/api/usuario",
-                    loginHandler);
-
-            // DASHBOARD
-            servidor.createContext(
-                    "/api/dashboard/resumo",
-                    new DashboardHandler(produtos, lotes));
-
-            // RELATÓRIOS
-            servidor.createContext(
-                    "/api/relatorios/estoque-por-produto",
-                    new RelatoriosHandler(produtos, lotes));
-
-            // PRODUTOS
-            // Agora recebe também as movimentações.
-            ProdutosHandler produtosHandler =
-                    new ProdutosHandler(
-                            produtos,
-                            categorias,
-                            lotes,
-                            movimentacoes);
-
-            servidor.createContext(
-                    "/api/produtos",
-                    produtosHandler);
-
-            // CATEGORIAS
-            servidor.createContext(
-                    "/api/categorias",
-                    produtosHandler);
-
-            // LOTES
-            LotesHandler lotesHandler =
-                    new LotesHandler(lotes, produtos, movimentacoes);
-
-            servidor.createContext(
-                    "/api/lotes",
-                    lotesHandler);
-
-            // PRÓXIMOS DO VENCIMENTO
-            servidor.createContext(
-                    "/api/lotes/proximos-vencimento",
-                    new ProximosVencimentoHandler(
-                            lotes,
-                            produtos));
-
-            // MOVIMENTAÇÕES
-            servidor.createContext(
-                    "/api/movimentacoes",
-                    new MovimentacoesHandler(
-                            cliente,
-                            lotes,
-                            movimentacoes));
-
-            // ENCERRAMENTO SEGURO
-            Runtime.getRuntime().addShutdownHook(
-                    new Thread(() -> {
-
-                        servidor.stop(0);
-                        cliente.close();
-
-                // Conecta ao MongoDB Atlas
                 MongoClient cliente = MongoDBConnection.conectar();
 
-            servidor.start();
+                try {
+                        // CONEXÃO COM O BANCO
+                        MongoDatabase banco = cliente.getDatabase("desperdicio_alimentos");
 
-                        // Seleciona o banco
-                        MongoDatabase banco = cliente.getDatabase(
-                                        "desperdicio_alimentos");
+                        banco.runCommand(new Document("ping", 1));
 
-                        // Verifica a conexão
-                        banco.runCommand(
-                                        new Document("ping", 1));
+                        // COLEÇÕES
+                        MongoCollection<Document> usuarios = banco.getCollection("users");
 
-            System.out.println(
-                    "Rotas de cadastro e login disponíveis!");
+                        MongoCollection<Document> sessoes = banco.getCollection("sessoes");
 
-            System.out.println(
-                    "Rotas de produtos, lotes e movimentações disponíveis!");
+                        MongoCollection<Document> produtos = banco.getCollection("itens");
 
-        } catch (Exception erro) {
+                        MongoCollection<Document> lotes = banco.getCollection("lotes");
 
-                        // Impede e-mails duplicados
+                        MongoCollection<Document> movimentacoes = banco.getCollection("movimentacoes");
+
+                        MongoCollection<Document> categorias = banco.getCollection("categorias");
+
+                        // ÍNDICES DOS USUÁRIOS E SESSÕES
                         usuarios.createIndex(
                                         Indexes.ascending("email"),
                                         new IndexOptions().unique(true));
 
-                        // Cria o servidor HTTP local
+                        sessoes.createIndex(
+                                        Indexes.ascending("token"),
+                                        new IndexOptions().unique(true));
+
+                        sessoes.createIndex(
+                                        Indexes.ascending("expiraEm"),
+                                        new IndexOptions().expireAfter(
+                                                        0L, TimeUnit.SECONDS));
+
+                        // SERVIDOR HTTP
                         HttpServer servidor = HttpServer.create(
-                                        new InetSocketAddress(
-                                                        "127.0.0.1",
-                                                        8080),
+                                        new InetSocketAddress("127.0.0.1", 8080),
                                         0);
 
-                        // Registra a rota de cadastro
+                        // USUÁRIOS
                         servidor.createContext(
                                         "/api/usuarios",
                                         new UsuariosHandler(usuarios));
 
-                        // Colecao de produtos
-                        MongoCollection<Document> produtos = banco.getCollection("itens");
-                        MongoCollection<Document> lotes = banco.getCollection("lotes");
+                        // LOGIN E SESSÕES
+                        LoginHandler loginHandler = new LoginHandler(usuarios, sessoes);
 
-                        // Colecao de movimentacoes - Tela 7
-                        MongoCollection<Document> movimentacoes = banco.getCollection("movimentacoes");
+                        servidor.createContext("/api/login", loginHandler);
+                        servidor.createContext("/api/logout", loginHandler);
+                        servidor.createContext("/api/usuario", loginHandler);
 
-                        // Rota de resumo do Dashboard
+                        // DASHBOARD
                         servidor.createContext(
                                         "/api/dashboard/resumo",
-                                        // passo como parâmetro o documento itens que está associado a variável produtos
                                         new DashboardHandler(produtos, lotes));
 
-                        // Rota de relatório de estoque por produto
-                        RelatoriosHandler relatorioHandler = new RelatoriosHandler(produtos, lotes, movimentacoes);
+                        // RELATÓRIOS
+                        RelatoriosHandler relatoriosHandler = new RelatoriosHandler(
+                                        produtos,
+                                        lotes,
+                                        movimentacoes);
 
-                        servidor.createContext("/api/relatorios", relatorioHandler);
+                        servidor.createContext(
+                                        "/api/relatorios/",
+                                        relatoriosHandler);
 
-                        // Colecao de categorias
-                        MongoCollection<Document> categorias = banco.getCollection("categorias");
+                        // PRODUTOS E CATEGORIAS
+                        ProdutosHandler produtosHandler = new ProdutosHandler(
+                                        produtos,
+                                        categorias,
+                                        lotes,
+                                        movimentacoes);
 
-                        // Handler compartilhado dos produtos, categorias e lotes
-                        ProdutosHandler produtosHandler = new ProdutosHandler(produtos, categorias, lotes);
-
-                        // Rota de cadastro dos produtos
                         servidor.createContext(
                                         "/api/produtos",
                                         produtosHandler);
 
-                        // Rota de consulta das categorias
                         servidor.createContext(
                                         "/api/categorias",
                                         produtosHandler);
 
-                        // Handler responsavel pelo cadastro dos lotes
-                        LotesHandler lotesHandler = new LotesHandler(lotes, produtos);
+                        // LOTES
+                        LotesHandler lotesHandler = new LotesHandler(
+                                        lotes,
+                                        produtos,
+                                        movimentacoes);
 
-                        // Registra a rota de cadastro dos lotes
                         servidor.createContext(
                                         "/api/lotes",
                                         lotesHandler);
 
-                        // Rota de proximos vencimentos - Tela 6
+                        // PRÓXIMOS VENCIMENTOS
                         servidor.createContext(
                                         "/api/lotes/proximos-vencimento",
-                                        new ProximosVencimentoHandler(lotes, produtos));
+                                        new ProximosVencimentoHandler(
+                                                        lotes,
+                                                        produtos));
 
-                        // Rota de registro de saidas e desperdicios - Tela 7
+                        // MOVIMENTAÇÕES
                         servidor.createContext(
                                         "/api/movimentacoes",
                                         new MovimentacoesHandler(
@@ -241,16 +125,14 @@ public class Main {
                                                         lotes,
                                                         movimentacoes));
 
-                        // Fecha recursos quando o servidor parar
+                        // ENCERRAMENTO SEGURO
                         Runtime.getRuntime().addShutdownHook(
                                         new Thread(() -> {
-
                                                 servidor.stop(0);
                                                 cliente.close();
-
                                         }));
 
-                        // Inicia o servidor
+                        // INICIALIZAÇÃO
                         servidor.start();
 
                         System.out.println(
@@ -260,12 +142,8 @@ public class Main {
                                         "MongoDB conectado com sucesso!");
 
                 } catch (Exception erro) {
-
                         cliente.close();
                         throw erro;
-
                 }
-
         }
-
 }
