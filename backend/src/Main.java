@@ -2,6 +2,7 @@
 import com.sun.net.httpserver.HttpServer;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
@@ -22,17 +23,20 @@ public class Main {
 
         try {
 
+            // CONEXÃO COM O BANCO
             MongoDatabase banco = cliente.getDatabase(
                     "desperdicio_alimentos");
 
             banco.runCommand(new Document("ping", 1));
 
+            // COLEÇÕES DE USUÁRIOS
             MongoCollection<Document> usuarios =
                     banco.getCollection("users");
 
             MongoCollection<Document> sessoes =
                     banco.getCollection("sessoes");
 
+            // ÍNDICES
             usuarios.createIndex(
                     Indexes.ascending("email"),
                     new IndexOptions().unique(true));
@@ -43,16 +47,34 @@ public class Main {
 
             sessoes.createIndex(
                     Indexes.ascending("expiraEm"),
-                    new IndexOptions().expireAfter(0L, java.util.concurrent.TimeUnit.SECONDS));
+                    new IndexOptions().expireAfter(
+                            0L,
+                            TimeUnit.SECONDS));
 
+            // COLEÇÕES DO SISTEMA
+            MongoCollection<Document> produtos =
+                    banco.getCollection("itens");
+
+            MongoCollection<Document> lotes =
+                    banco.getCollection("lotes");
+
+            MongoCollection<Document> movimentacoes =
+                    banco.getCollection("movimentacoes");
+
+            MongoCollection<Document> categorias =
+                    banco.getCollection("categorias");
+
+            // INICIALIZAÇÃO DO SERVIDOR
             HttpServer servidor = HttpServer.create(
                     new InetSocketAddress("127.0.0.1", 8080),
                     0);
 
+            // USUÁRIOS
             servidor.createContext(
                     "/api/usuarios",
                     new UsuariosHandler(usuarios));
 
+            // LOGIN E SESSÃO
             LoginHandler loginHandler =
                     new LoginHandler(usuarios, sessoes);
 
@@ -68,48 +90,50 @@ public class Main {
                     "/api/usuario",
                     loginHandler);
 
-            MongoCollection<Document> produtos =
-                    banco.getCollection("itens");
-
-            MongoCollection<Document> lotes =
-                    banco.getCollection("lotes");
-
-            MongoCollection<Document> movimentacoes =
-                    banco.getCollection("movimentacoes");
-
+            // DASHBOARD
             servidor.createContext(
                     "/api/dashboard/resumo",
                     new DashboardHandler(produtos, lotes));
 
+            // RELATÓRIOS
             servidor.createContext(
                     "/api/relatorios/estoque-por-produto",
                     new RelatoriosHandler(produtos, lotes));
 
-            MongoCollection<Document> categorias =
-                    banco.getCollection("categorias");
-
+            // PRODUTOS
+            // Agora recebe também as movimentações.
             ProdutosHandler produtosHandler =
-                    new ProdutosHandler(produtos, categorias, lotes);
+                    new ProdutosHandler(
+                            produtos,
+                            categorias,
+                            lotes,
+                            movimentacoes);
 
             servidor.createContext(
                     "/api/produtos",
                     produtosHandler);
 
+            // CATEGORIAS
             servidor.createContext(
                     "/api/categorias",
                     produtosHandler);
 
+            // LOTES
             LotesHandler lotesHandler =
-                    new LotesHandler(lotes, produtos);
+                    new LotesHandler(lotes, produtos, movimentacoes);
 
             servidor.createContext(
                     "/api/lotes",
                     lotesHandler);
 
+            // PRÓXIMOS DO VENCIMENTO
             servidor.createContext(
                     "/api/lotes/proximos-vencimento",
-                    new ProximosVencimentoHandler(lotes, produtos));
+                    new ProximosVencimentoHandler(
+                            lotes,
+                            produtos));
 
+            // MOVIMENTAÇÕES
             servidor.createContext(
                     "/api/movimentacoes",
                     new MovimentacoesHandler(
@@ -117,10 +141,13 @@ public class Main {
                             lotes,
                             movimentacoes));
 
+            // ENCERRAMENTO SEGURO
             Runtime.getRuntime().addShutdownHook(
                     new Thread(() -> {
+
                         servidor.stop(0);
                         cliente.close();
+
                     }));
 
             servidor.start();
@@ -133,6 +160,9 @@ public class Main {
 
             System.out.println(
                     "Rotas de cadastro e login disponíveis!");
+
+            System.out.println(
+                    "Rotas de produtos, lotes e movimentações disponíveis!");
 
         } catch (Exception erro) {
 
