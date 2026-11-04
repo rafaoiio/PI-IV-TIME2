@@ -1,317 +1,305 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    const formulario =
-        document.getElementById("formCadastroLote");
-
-    const campoProduto =
-        document.getElementById("produto");
-
-    const campoQuantidade =
-        document.getElementById("quantidadeRecebida");
-
-    const campoValorUnitario =
-        document.getElementById("valorUnitario");
-
-    const campoCustoTotal =
-        document.getElementById("custoTotalAquisicao");
-
     const API = "http://localhost:8080/api";
 
-    // Carrega os produtos cadastrados no MongoDB
+    const formulario = document.getElementById("formCadastroLote");
+
+    const campoProduto = document.getElementById("produto");
+    const campoCodigo = document.getElementById("codigoLote");
+    const campoQuantidade = document.getElementById("quantidadeRecebida");
+    const campoEntrada = document.getElementById("dataEntrada");
+    const campoValidade = document.getElementById("dataValidade");
+    const campoValorUnitario = document.getElementById("valorUnitario");
+    const campoCustoTotal = document.getElementById("custoTotalAquisicao");
+    const campoObservacao = document.getElementById("observacao");
+
+    const botaoSalvar = document.getElementById("botaoSalvar");
+    const botaoCancelar = document.getElementById("botaoCancelar");
+    const mensagem = document.getElementById("mensagemFormulario");
+
+    const parametros = new URLSearchParams(window.location.search);
+    const loteId = parametros.get("id");
+
+    const editando = Boolean(loteId);
+
+    let carregado = !editando;
+
+    function mostrarErro(texto) {
+        mensagem.textContent = texto;
+        mensagem.classList.remove("hidden");
+    }
+
+    function limparErro() {
+        mensagem.textContent = "";
+        mensagem.classList.add("hidden");
+    }
+
+    async function lerResposta(resposta) {
+
+        const texto = await resposta.text();
+        let dados = {};
+
+        if (texto) {
+            try {
+                dados = JSON.parse(texto);
+            } catch {
+                dados = { mensagem: texto };
+            }
+        }
+
+        if (!resposta.ok) {
+            throw new Error(
+                dados.mensagem || `Erro HTTP ${resposta.status}`
+            );
+        }
+
+        return dados;
+    }
+
+    // CARREGAR PRODUTOS
     async function carregarProdutos() {
+
+        campoProduto.disabled = true;
+        campoProduto.replaceChildren();
+
+        const carregando = document.createElement("option");
+        carregando.value = "";
+        carregando.textContent = "Carregando produtos...";
+        campoProduto.appendChild(carregando);
+
+        const resposta = await fetch(`${API}/produtos`);
+        const dados = await lerResposta(resposta);
+
+        if (!Array.isArray(dados.produtos)) {
+            throw new Error("Resposta de produtos inválida.");
+        }
 
         campoProduto.replaceChildren();
 
-        const opcaoInicial = document.createElement("option");
+        const inicial = document.createElement("option");
+        inicial.value = "";
+        inicial.textContent = "Selecione um produto cadastrado";
+        campoProduto.appendChild(inicial);
 
-        opcaoInicial.value = "";
-        opcaoInicial.textContent = "Carregando produtos...";
+        dados.produtos.forEach(produto => {
 
-        campoProduto.appendChild(opcaoInicial);
-        campoProduto.disabled = true;
+            if (!produto.id || !produto.nome) return;
 
-        try {
+            // Produtos inativos não podem receber lotes novos.
+            if (!editando && produto.status === "inativo") return;
 
-            const resposta = await fetch(
-                `${API}/produtos`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Accept": "application/json"
-                    }
-                }
-            );
+            const opcao = document.createElement("option");
+            opcao.value = produto.id;
+            opcao.textContent = produto.nome;
 
-            if (!resposta.ok) {
-                throw new Error(
-                    "Nao foi possivel carregar os produtos."
-                );
-            }
+            campoProduto.appendChild(opcao);
+        });
 
-            const dados = await resposta.json();
-
-            if (!Array.isArray(dados.produtos)) {
-                throw new Error(
-                    "Resposta de produtos invalida."
-                );
-            }
-
-            campoProduto.replaceChildren();
-
-            const opcaoPadrao = document.createElement("option");
-
-            opcaoPadrao.value = "";
-            opcaoPadrao.textContent =
-                "Selecione um produto cadastrado";
-
-            campoProduto.appendChild(opcaoPadrao);
-
-            // Adiciona os produtos na lista
-            dados.produtos.forEach((produto) => {
-
-                if (!produto.id || !produto.nome) {
-                    return;
-                }
-
-                const opcao = document.createElement("option");
-
-                opcao.value = produto.id;
-                opcao.textContent = produto.nome;
-
-                campoProduto.appendChild(opcao);
-            });
-
-            campoProduto.disabled = false;
-
-        } catch (erro) {
-
-            console.error(
-                "Erro ao carregar produtos:",
-                erro
-            );
-
-            campoProduto.replaceChildren();
-
-            const opcaoErro = document.createElement("option");
-
-            opcaoErro.value = "";
-            opcaoErro.textContent =
-                "Erro ao carregar produtos";
-
-            campoProduto.appendChild(opcaoErro);
-
-            alert(
-                "Nao foi possivel carregar os produtos. " +
-                "Verifique se o backend Java esta funcionando."
-            );
-        }
+        campoProduto.disabled = false;
     }
 
-    // Calcula automaticamente o custo total de aquisicao
     function calcularCustoTotal() {
 
-        const quantidade = Number(
-            campoQuantidade.value
-        );
-
-        const valorUnitario = Number(
-            campoValorUnitario.value
-        );
+        const quantidade = Number(campoQuantidade.value);
+        const valor = Number(campoValorUnitario.value);
 
         if (
-            campoQuantidade.value === "" ||
-            campoValorUnitario.value === "" ||
+            !campoQuantidade.value ||
+            !campoValorUnitario.value ||
             !Number.isFinite(quantidade) ||
-            !Number.isFinite(valorUnitario) ||
+            !Number.isFinite(valor) ||
             quantidade <= 0 ||
-            valorUnitario <= 0
+            valor <= 0
         ) {
-
             campoCustoTotal.value = "";
             return;
         }
 
-        const custoTotal =
-            quantidade * valorUnitario;
-
         campoCustoTotal.value =
-            custoTotal.toFixed(2);
+            (quantidade * valor).toFixed(2);
     }
 
-    // Atualiza o custo total quando a quantidade mudar
-    campoQuantidade.addEventListener(
-        "input",
-        calcularCustoTotal
-    );
+    campoQuantidade.addEventListener("input", calcularCustoTotal);
+    campoValorUnitario.addEventListener("input", calcularCustoTotal);
 
-    // Atualiza o custo total quando o valor mudar
-    campoValorUnitario.addEventListener(
-        "input",
-        calcularCustoTotal
-    );
-
-    // Limpa o custo total quando o formulario for redefinido
     formulario.addEventListener("reset", () => {
         campoCustoTotal.value = "";
     });
 
-    // Cadastra um novo lote
-    formulario.addEventListener("submit", async (evento) => {
+    // ADAPTA O FORMULÁRIO
+    if (editando) {
+
+        document.title =
+            "Editar Lote | Sistema de Gestão e Redução de Desperdício";
+
+        document.getElementById("caminhoPagina").textContent =
+            "/ Editar Lote";
+
+        document.getElementById("tituloFormulario").textContent =
+            "Editar lote";
+
+        botaoSalvar.textContent = "Salvar alterações";
+        botaoSalvar.disabled = true;
+    }
+
+    // CARREGAR O LOTE PARA EDIÇÃO
+    async function carregarLote() {
+
+        const resposta = await fetch(
+            `${API}/lotes/${encodeURIComponent(loteId)}`
+        );
+
+        const dados = await lerResposta(resposta);
+        const lote = dados.lote || dados;
+
+        campoProduto.value = lote.itemId || "";
+
+        if (!campoProduto.value) {
+            throw new Error("Produto do lote não encontrado na lista.");
+        }
+
+        campoCodigo.value = lote.codigo || "";
+
+        campoQuantidade.value =
+            lote.quantidadeInicial ?? "";
+
+        campoEntrada.value =
+            String(lote.dataEntrada || "").slice(0, 10);
+
+        campoValidade.value =
+            String(lote.dataValidade || "").slice(0, 10);
+
+        campoObservacao.value = lote.observacao || "";
+
+        // Recupera valor unitário usando o custo salvo.
+        const quantidade = Number(lote.quantidadeInicial);
+        const custo = Number(lote.custoTotalAquisicao);
+
+        if (quantidade > 0 && Number.isFinite(custo)) {
+            campoValorUnitario.value =
+                (custo / quantidade).toFixed(2);
+        }
+
+        calcularCustoTotal();
+
+        if (lote.possuiMovimentacoes === true) {
+            campoProduto.disabled = true;
+            campoQuantidade.readOnly = true;
+
+            campoProduto.title =
+                "Produto bloqueado: o lote possui movimentações.";
+
+            campoQuantidade.title =
+                "Quantidade bloqueada: o lote possui movimentações.";
+        }
+
+        carregado = true;
+        botaoSalvar.disabled = false;
+    }
+
+    botaoCancelar.addEventListener("click", () => {
+        window.location.href = "todos-lotes.html";
+    });
+
+    // ENVIA CADASTRO OU EDIÇÃO
+    formulario.addEventListener("submit", async evento => {
 
         evento.preventDefault();
+        limparErro();
 
-        // Verifica se os campos obrigatorios foram preenchidos
-        if (!formulario.reportValidity()) {
+        if (!carregado) {
+            mostrarErro("O lote ainda não foi carregado.");
             return;
         }
 
-        // Recupera os dados preenchidos
+        if (!formulario.reportValidity()) return;
+
         const lote = {
-
-            itemId:
-                campoProduto.value,
-
-            codigo:
-                document.getElementById("codigoLote")
-                    .value.trim(),
-
-            quantidadeRecebida:
-                campoQuantidade.value,
-
-            dataEntrada:
-                document.getElementById("dataEntrada")
-                    .value,
-
-            dataValidade:
-                document.getElementById("dataValidade")
-                    .value,
-
-            valorUnitario:
-                campoValorUnitario.value,
-
-            observacao:
-                document.getElementById("observacao")
-                    .value.trim()
+            itemId: campoProduto.value,
+            codigo: campoCodigo.value.trim(),
+            quantidadeRecebida: campoQuantidade.value,
+            dataEntrada: campoEntrada.value,
+            dataValidade: campoValidade.value,
+            valorUnitario: campoValorUnitario.value,
+            observacao: campoObservacao.value.trim()
         };
 
-        // Verifica se um produto foi selecionado
         if (!lote.itemId) {
-
-            alert("Selecione um produto.");
+            mostrarErro("Selecione um produto.");
             return;
         }
 
-        // Verifica se a validade e anterior a entrada
         if (lote.dataValidade < lote.dataEntrada) {
-
-            alert(
-                "A validade nao pode ser anterior a data de entrada."
+            mostrarErro(
+                "A validade não pode ser anterior à data de entrada."
             );
             return;
         }
 
-        const botao = formulario.querySelector(
-            'button[type="submit"]'
-        );
-
-        // Desativa o botao durante o cadastro
-        botao.disabled = true;
-        botao.textContent = "Cadastrando...";
+        botaoSalvar.disabled = true;
+        botaoSalvar.textContent =
+            editando ? "Salvando..." : "Cadastrando...";
 
         try {
 
-            console.log(
-                "Enviando lote ao backend:",
-                lote
-            );
+            const url = editando
+                ? `${API}/lotes/${encodeURIComponent(loteId)}`
+                : `${API}/lotes`;
 
-            // Envia os dados para o Java
-            const resposta = await fetch(
-                `${API}/lotes`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
-                    },
-                    body: JSON.stringify(lote)
-                }
-            );
+            const resposta = await fetch(url, {
+                method: editando ? "PUT" : "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(lote)
+            });
 
-            // Le a resposta enviada pelo backend
-            const textoResposta = await resposta.text();
+            const resultado = await lerResposta(resposta);
 
-            let resultado;
-
-            try {
-
-                resultado = JSON.parse(textoResposta);
-
-            } catch (erro) {
-
-                throw new Error(
-                    "O backend nao retornou um JSON valido."
-                );
-            }
-
-            // Verifica se ocorreu algum erro HTTP
-            if (!resposta.ok) {
-
-                throw new Error(
-                    resultado.mensagem ||
-                    `Erro HTTP ${resposta.status} ao cadastrar lote.`
-                );
-            }
-
-            // Confirma que o lote foi cadastrado
             alert(
                 resultado.mensagem ||
-                "Lote cadastrado com sucesso!"
+                (editando
+                    ? "Lote atualizado com sucesso!"
+                    : "Lote cadastrado com sucesso!")
             );
 
-            console.log(
-                "Lote cadastrado:",
-                resultado
-            );
-
-            // Limpa os campos do formulario
-            formulario.reset();
-            campoCustoTotal.value = "";
-
-        } catch (erro) {
-
-            console.error(
-                "Erro ao cadastrar lote:",
-                erro
-            );
-
-            // Diferencia erros de conexao dos erros do backend
-            if (erro instanceof TypeError) {
-
-                alert(
-                    "Falha na comunicacao com o backend. " +
-                    "Verifique se o servidor Java esta ativo " +
-                    "e se a rota /api/lotes esta funcionando."
-                );
-
+            if (editando) {
+                window.location.href = "todos-lotes.html";
             } else {
-
-                alert(
-                    erro.message ||
-                    "Nao foi possivel cadastrar o lote."
-                );
+                formulario.reset();
+                campoCustoTotal.value = "";
             }
 
-        } finally {
+        } catch (erro) {
+            console.error(erro);
+            mostrarErro(erro.message);
 
-            // Reativa o botao apos a tentativa
-            botao.disabled = false;
-            botao.textContent = "Cadastrar novo lote";
+        } finally {
+            botaoSalvar.disabled = false;
+            botaoSalvar.textContent = editando
+                ? "Salvar alterações"
+                : "Cadastrar novo lote";
         }
     });
 
-    // Busca os produtos quando a pagina abrir
-    carregarProdutos();
+    // INICIALIZAÇÃO
+    async function iniciar() {
+        try {
+            await carregarProdutos();
+
+            if (editando) {
+                await carregarLote();
+            }
+
+        } catch (erro) {
+            console.error(erro);
+            mostrarErro(erro.message);
+            botaoSalvar.disabled = true;
+        }
+    }
+
+    iniciar();
 
 });

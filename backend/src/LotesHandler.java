@@ -6,6 +6,8 @@ import com.mongodb.MongoException;
 import com.mongodb.MongoWriteException;
 import com.mongodb.ErrorCategory;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 
 import org.bson.Document;
 import org.bson.types.Decimal128;
@@ -23,316 +25,274 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
 
 public class LotesHandler implements HttpHandler {
 
     private final MongoCollection<Document> lotes;
     private final MongoCollection<Document> itens;
+    private final MongoCollection<Document> movimentacoes;
 
-    // Origens permitidas para o Live Server
     private static final Set<String> ORIGENS = Set.of(
         "http://localhost:5500",
         "http://127.0.0.1:5500"
     );
 
-    // Construtor
+    // =====================================================
+    // CONSTRUTOR
+    // =====================================================
+
     public LotesHandler(
         MongoCollection<Document> lotes,
-        MongoCollection<Document> itens
+        MongoCollection<Document> itens,
+        MongoCollection<Document> movimentacoes
     ) {
         this.lotes = lotes;
         this.itens = itens;
+        this.movimentacoes = movimentacoes;
     }
 
-    // Recebe as requisicoes HTTP
-    @Override
-    public void handle(HttpExchange requisicao)
-            throws IOException {
+    // =====================================================
+    // ROTAS HTTP
+    // =====================================================
 
-        String origem = requisicao.getRequestHeaders()
+    @Override
+    public void handle(HttpExchange req) throws IOException {
+
+        String origem = req.getRequestHeaders()
             .getFirst("Origin");
 
-        boolean origemPermitida =
-            origem != null && ORIGENS.contains(origem);
+        if (origem != null && !ORIGENS.contains(origem)) {
+            responder(req, 403, "Origem nao permitida.");
+            return;
+        }
 
-        // Configura o CORS
-        if (origemPermitida) {
+        if (origem != null) {
 
-            requisicao.getResponseHeaders().set(
+            req.getResponseHeaders().set(
                 "Access-Control-Allow-Origin",
                 origem
             );
 
-            requisicao.getResponseHeaders().set(
+            req.getResponseHeaders().set(
                 "Access-Control-Allow-Headers",
                 "Content-Type"
             );
 
-            requisicao.getResponseHeaders().set(
+            req.getResponseHeaders().set(
                 "Access-Control-Allow-Methods",
-                "GET, POST, OPTIONS"
+                "GET, POST, PUT, PATCH, DELETE, OPTIONS"
             );
 
-            requisicao.getResponseHeaders().set(
+            req.getResponseHeaders().set(
                 "Vary",
                 "Origin"
             );
         }
 
-        // Bloqueia origens nao permitidas
-        if (origem != null && !origemPermitida) {
+        req.getResponseHeaders().set(
+            "Cache-Control",
+            "no-store"
+        );
 
-            responder(
-                requisicao,
-                403,
-                "Origem nao permitida."
-            );
+        String metodo = req.getRequestMethod();
+        String caminho = req.getRequestURI().getPath();
+
+        if (metodo.equals("OPTIONS")) {
+
+            req.sendResponseHeaders(204, -1);
+            req.close();
             return;
         }
 
-        String metodo = requisicao.getRequestMethod();
+        try {
 
-        // Responde a verificacao CORS
-        if (metodo.equals("OPTIONS")) {
+            // LISTAR OU CADASTRAR LOTES
+            if (caminho.equals("/api/lotes")) {
 
-            if (!origemPermitida) {
+                switch (metodo) {
 
-                responder(
-                    requisicao,
-                    403,
-                    "Origem nao permitida."
-                );
+                    case "GET":
+                        listarLotes(req);
+                        break;
+
+                    case "POST":
+                        cadastrarLote(req);
+                        break;
+
+                    default:
+                        responder(
+                            req,
+                            405,
+                            "Metodo nao permitido."
+                        );
+                }
+
                 return;
             }
 
-            requisicao.sendResponseHeaders(204, -1);
-            requisicao.close();
-            return;
-        }
+            // ROTAS COM ID
+            if (caminho.startsWith("/api/lotes/")) {
 
-        // Lista os lotes cadastrados
-        if (metodo.equals("GET")) {
-
-            listarLotes(requisicao);
-            return;
-        }
-
-        // Permite o cadastro apenas pelo metodo POST
-        if (!metodo.equals("POST")) {
-
-            requisicao.getResponseHeaders().set(
-                "Allow",
-                "GET, POST, OPTIONS"
-            );
-
-            responder(
-                requisicao,
-                405,
-                "Metodo nao permitido."
-            );
-            return;
-        }
-
-        // Executa o cadastro do lote
-        try {
-
-            cadastrarLote(requisicao);
-
-        } catch (Exception erro) {
-
-            System.err.println(
-                "Erro inesperado ao cadastrar lote:"
-            );
-
-            erro.printStackTrace();
-
-            try {
-
-                responder(
-                    requisicao,
-                    500,
-                    "Erro interno ao cadastrar lote."
+                String restante = caminho.substring(
+                    "/api/lotes/".length()
                 );
 
-            } catch (IOException | IllegalStateException erroResposta) {
+                String[] partes = restante.split("/", -1);
 
-                System.err.println(
-                    "Falha ao enviar resposta: "
-                    + erroResposta.getMessage()
-                );
-            }
-        }
-    }
+                if (
+                    partes.length < 1 ||
+                    partes.length > 2 ||
+                    !ObjectId.isValid(partes[0])
+                ) {
 
-    // Busca todos os lotes cadastrados no MongoDB
-    private void listarLotes(HttpExchange requisicao)
-            throws IOException {
+                    responder(
+                        req,
+                        400,
+                        "ID do lote invalido."
+                    );
 
-        try {
-
-            List<Document> lista = new ArrayList<>();
-
-            // Consulta a colecao lotes
-            for (Document lote : lotes.find()
-                    .sort(new Document("dataEntrada", -1))) {
-
-                ObjectId itemId = lote.getObjectId("itemId");
-
-                String nomeProduto = "Produto nao encontrado";
-
-                // Busca o nome na colecao itens
-                if (itemId != null) {
-
-                    Document produto = itens.find(
-                        eq("_id", itemId)
-                    ).first();
-
-                    if (produto != null) {
-
-                        String nome = produto.getString("nome");
-
-                        if (nome != null) {
-                            nomeProduto = nome;
-                        }
-                    }
+                    return;
                 }
 
-                // Recupera os valores armazenados
-                Decimal128 quantidadeInicial =
-                    lote.get(
-                        "quantidadeInicial",
-                        Decimal128.class
-                    );
+                ObjectId id = new ObjectId(partes[0]);
 
-                Decimal128 quantidadeDisponivel =
-                    lote.get(
-                        "quantidadeDisponivel",
-                        Decimal128.class
-                    );
+                // /api/lotes/{id}
+                if (partes.length == 1) {
 
-                Decimal128 custoTotal =
-                    lote.get(
-                        "custoTotalAquisicao",
-                        Decimal128.class
-                    );
+                    switch (metodo) {
 
-                Date entrada =
-                    lote.getDate("dataEntrada");
+                        case "GET":
+                            buscarLote(req, id);
+                            break;
 
-                Date validade =
-                    lote.getDate("dataValidade");
+                        case "PUT":
+                            atualizarLote(req, id);
+                            break;
 
-                // Prepara os dados para a tabela
-                Document resultado = new Document()
-                    .append(
-                        "id",
-                        lote.getObjectId("_id").toHexString()
-                    )
-                    .append(
-                        "codigo",
-                        lote.getString("codigo")
-                    )
-                    .append(
-                        "produto",
-                        nomeProduto
-                    )
-                    .append(
-                        "quantidadeInicial",
-                        quantidadeInicial != null
-                            ? quantidadeInicial.bigDecimalValue()
-                                .toPlainString()
-                            : null
-                    )
-                    .append(
-                        "quantidadeDisponivel",
-                        quantidadeDisponivel != null
-                            ? quantidadeDisponivel.bigDecimalValue()
-                                .toPlainString()
-                            : null
-                    )
-                    .append(
-                        "custoTotalAquisicao",
-                        custoTotal != null
-                            ? custoTotal.bigDecimalValue()
-                                .toPlainString()
-                            : null
-                    )
-                    .append(
-                        "dataEntrada",
-                        entrada != null
-                            ? entrada.toInstant().toString()
-                            : null
-                    )
-                    .append(
-                        "dataValidade",
-                        validade != null
-                            ? validade.toInstant().toString()
-                            : null
-                    );
+                        case "DELETE":
+                            excluirLote(req, id);
+                            break;
 
-                lista.add(resultado);
+                        default:
+                            responder(
+                                req,
+                                405,
+                                "Metodo nao permitido."
+                            );
+                    }
+
+                    return;
+                }
+
+                // VERIFICAR EXCLUSÃO
+                if (
+                    partes[1].equals("exclusao") &&
+                    metodo.equals("GET")
+                ) {
+
+                    verificarExclusao(req, id);
+                    return;
+                }
+
+                // INATIVAR OU REATIVAR
+                if (
+                    partes[1].equals("status") &&
+                    metodo.equals("PATCH")
+                ) {
+
+                    alterarStatus(req, id);
+                    return;
+                }
             }
 
-            // Envia os lotes ao JavaScript
-            responderJSON(
-                requisicao,
-                200,
-                new Document("lotes", lista)
+            responder(
+                req,
+                404,
+                "Rota nao encontrada."
             );
+
+        } catch (IllegalArgumentException erro) {
+
+            responder(
+                req,
+                400,
+                erro.getMessage()
+            );
+
+        } catch (MongoWriteException erro) {
+
+            if (
+                erro.getError().getCategory() ==
+                ErrorCategory.DUPLICATE_KEY
+            ) {
+
+                responder(
+                    req,
+                    409,
+                    "Codigo de lote ja cadastrado."
+                );
+
+            } else {
+
+                System.err.println(
+                    "Erro ao salvar lote: " +
+                    erro.getMessage()
+                );
+
+                responder(
+                    req,
+                    500,
+                    "Erro ao salvar no MongoDB."
+                );
+            }
 
         } catch (MongoException erro) {
 
             System.err.println(
-                "Erro ao listar lotes: " + erro.getMessage()
+                "Erro MongoDB: " + erro.getMessage()
             );
 
             responder(
-                requisicao,
+                req,
                 500,
-                "Erro ao buscar lotes no MongoDB."
+                "Erro ao acessar o banco de dados."
             );
 
         } catch (RuntimeException erro) {
 
             System.err.println(
-                "Erro ao processar lotes:"
+                "Erro interno: " + erro.getMessage()
             );
 
-            erro.printStackTrace();
-
             responder(
-                requisicao,
+                req,
                 500,
-                "Erro interno ao listar lotes."
+                "Erro interno do servidor."
             );
         }
     }
 
-    // Cadastra um novo lote no MongoDB
-    private void cadastrarLote(HttpExchange requisicao)
-            throws IOException {
+    // =====================================================
+    // LEITURA DOS DADOS
+    // =====================================================
 
-        // Limita o tamanho da requisicao
-        byte[] conteudo = requisicao.getRequestBody()
+    private Document lerDados(HttpExchange req)
+        throws IOException {
+
+        byte[] conteudo = req.getRequestBody()
             .readNBytes(8193);
 
         if (conteudo.length > 8192) {
 
-            responder(
-                requisicao,
-                413,
+            throw new IllegalArgumentException(
                 "Dados enviados sao muito grandes."
             );
-            return;
         }
-
-        // Converte o JSON recebido
-        Document dados;
 
         try {
 
-            dados = Document.parse(
+            return Document.parse(
                 new String(
                     conteudo,
                     StandardCharsets.UTF_8
@@ -341,62 +301,177 @@ public class LotesHandler implements HttpHandler {
 
         } catch (RuntimeException erro) {
 
-            responder(
-                requisicao,
-                400,
+            throw new IllegalArgumentException(
                 "JSON invalido."
             );
-            return;
+        }
+    }
+
+    private static String obterTexto(
+        Document dados,
+        String campo
+    ) {
+
+        Object valor = dados.get(campo);
+
+        return valor instanceof String
+            ? ((String) valor).trim()
+            : "";
+    }
+
+    private static BigDecimal obterDecimal(
+        Document dados,
+        String campo
+    ) {
+
+        Object valor = dados.get(campo);
+
+        if (valor instanceof Decimal128) {
+
+            return ((Decimal128) valor)
+                .bigDecimalValue();
         }
 
-        // Recupera os dados do formulario
-        String itemIdTexto =
-            obterTexto(dados, "itemId").trim();
+        if (valor instanceof Number) {
+
+            return new BigDecimal(
+                valor.toString()
+            );
+        }
+
+        if (valor instanceof String) {
+
+            try {
+
+                return new BigDecimal(
+                    (String) valor
+                );
+
+            } catch (NumberFormatException erro) {
+
+                return BigDecimal.ZERO;
+            }
+        }
+
+        return BigDecimal.ZERO;
+    }
+
+    private static String dataTexto(Date data) {
+
+        if (data == null) {
+            return null;
+        }
+
+        return data.toInstant().toString();
+    }
+
+    // =====================================================
+    // VALIDAR DADOS DO LOTE
+    // =====================================================
+
+    // O parametro loteExistenteId permite identificar
+    // se estamos cadastrando ou editando um lote.
+
+    private Document validarLote(
+        Document dados,
+        ObjectId loteExistenteId
+    ) {
+
+        String itemTexto =
+            obterTexto(dados, "itemId");
 
         String codigo =
-            obterTexto(dados, "codigo").trim();
+            obterTexto(dados, "codigo");
 
         String quantidadeTexto =
-            obterTexto(dados, "quantidadeRecebida").trim();
+            obterTexto(dados, "quantidadeRecebida");
 
         String valorTexto =
-            obterTexto(dados, "valorUnitario").trim();
+            obterTexto(dados, "valorUnitario");
 
         String entradaTexto =
-            obterTexto(dados, "dataEntrada").trim();
+            obterTexto(dados, "dataEntrada");
 
         String validadeTexto =
-            obterTexto(dados, "dataValidade").trim();
+            obterTexto(dados, "dataValidade");
 
         String observacao =
-            obterTexto(dados, "observacao").trim();
+            obterTexto(dados, "observacao");
 
-        // Valida o identificador do produto
-        if (!ObjectId.isValid(itemIdTexto)) {
+        // VALIDA O PRODUTO
+        if (!ObjectId.isValid(itemTexto)) {
 
-            responder(
-                requisicao,
-                400,
+            throw new IllegalArgumentException(
                 "Selecione um produto valido."
             );
-            return;
         }
 
-        ObjectId itemId =
-            new ObjectId(itemIdTexto);
+        ObjectId itemId = new ObjectId(itemTexto);
 
-        // Valida o codigo do lote
-        if (codigo.isEmpty() || codigo.length() > 50) {
+        Document produto = itens.find(
+            eq("_id", itemId)
+        ).first();
 
-            responder(
-                requisicao,
-                400,
-                "Informe um codigo de lote valido."
+        if (produto == null) {
+
+            throw new IllegalArgumentException(
+                "Produto nao encontrado."
             );
-            return;
         }
 
-        // Converte a quantidade e o valor unitario
+        // =================================================
+        // CORREÇÃO: PRODUTOS INATIVOS
+        // =================================================
+
+        // Não permite criar lotes de produtos inativos.
+        // Mas permite editar um lote que já pertence
+        // ao mesmo produto inativo.
+
+        if (
+            "inativo".equals(
+                produto.getString("status")
+            )
+        ) {
+
+            Document loteExistente =
+                loteExistenteId == null
+                    ? null
+                    : lotes.find(
+                        eq("_id", loteExistenteId)
+                    ).first();
+
+            if (
+                loteExistente == null ||
+                !itemId.equals(
+                    loteExistente.getObjectId("itemId")
+                )
+            ) {
+
+                throw new IllegalArgumentException(
+                    "Nao e permitido vincular lotes " +
+                    "a produto inativo."
+                );
+            }
+        }
+
+        // =================================================
+        // CÓDIGO DO LOTE
+        // =================================================
+
+        if (
+            codigo.isEmpty() ||
+            codigo.length() > 50
+        ) {
+
+            throw new IllegalArgumentException(
+                "Codigo de lote invalido."
+            );
+        }
+
+        // =================================================
+        // QUANTIDADE E VALOR
+        // =================================================
+
         BigDecimal quantidade;
         BigDecimal valorUnitario;
 
@@ -412,157 +487,161 @@ public class LotesHandler implements HttpHandler {
 
         } catch (NumberFormatException erro) {
 
-            responder(
-                requisicao,
-                400,
+            throw new IllegalArgumentException(
                 "Quantidade ou valor unitario invalido."
             );
-            return;
         }
 
-        // Verifica se a quantidade e positiva
         if (quantidade.signum() <= 0) {
 
-            responder(
-                requisicao,
-                400,
+            throw new IllegalArgumentException(
                 "A quantidade recebida deve ser maior que zero."
             );
-            return;
         }
 
-        // Verifica se o valor unitario e positivo
         if (valorUnitario.signum() <= 0) {
 
-            responder(
-                requisicao,
-                400,
+            throw new IllegalArgumentException(
                 "O valor unitario deve ser maior que zero."
             );
-            return;
         }
 
-        // Converte e valida as datas
-        Date dataEntrada;
-        Date dataValidade;
+        // =================================================
+        // DATAS
+        // =================================================
+
+        Date entrada;
+        Date validade;
 
         try {
 
-            LocalDate entrada =
+            LocalDate dataEntrada =
                 LocalDate.parse(entradaTexto);
 
-            LocalDate validade =
+            LocalDate dataValidade =
                 LocalDate.parse(validadeTexto);
 
-            if (validade.isBefore(entrada)) {
+            if (
+                dataValidade.isBefore(dataEntrada)
+            ) {
 
-                responder(
-                    requisicao,
-                    400,
-                    "A validade nao pode ser anterior a entrada."
+                throw new IllegalArgumentException(
+                    "A validade nao pode ser anterior " +
+                    "a data de entrada."
                 );
-                return;
             }
 
-            // Converte as datas para o formato Date
-            dataEntrada = Date.from(
-                entrada.atStartOfDay()
+            entrada = Date.from(
+                dataEntrada.atStartOfDay()
                     .toInstant(ZoneOffset.UTC)
             );
 
-            dataValidade = Date.from(
-                validade.atStartOfDay()
+            validade = Date.from(
+                dataValidade.atStartOfDay()
                     .toInstant(ZoneOffset.UTC)
             );
 
         } catch (DateTimeParseException erro) {
 
-            responder(
-                requisicao,
-                400,
+            throw new IllegalArgumentException(
                 "Informe datas validas."
             );
-            return;
         }
 
-        // Valida a observacao
-        if (observacao.isEmpty()
-                || observacao.length() > 1000) {
+        // =================================================
+        // OBSERVAÇÃO
+        // =================================================
 
-            responder(
-                requisicao,
-                400,
+        if (
+            observacao.isEmpty() ||
+            observacao.length() > 1000
+        ) {
+
+            throw new IllegalArgumentException(
                 "Observacao invalida."
             );
-            return;
         }
 
-        // Calcula o custo total de aquisicao
+        // =================================================
+        // CUSTO TOTAL
+        // =================================================
+
         BigDecimal custoTotal =
             quantidade.multiply(valorUnitario);
 
-        try {
+        Decimal128 quantidadeDecimal =
+            new Decimal128(quantidade);
 
-            // Verifica se o produto existe
-            Document produto = itens.find(
-                eq("_id", itemId)
-            ).first();
+        Decimal128 custoDecimal =
+            new Decimal128(custoTotal);
 
-            if (produto == null) {
+        return new Document()
+            .append("itemId", itemId)
+            .append("codigo", codigo)
+            .append(
+                "quantidadeInicial",
+                quantidadeDecimal
+            )
+            .append("dataEntrada", entrada)
+            .append("dataValidade", validade)
+            .append(
+                "custoTotalAquisicao",
+                custoDecimal
+            )
+            .append("observacao", observacao);
+    }
 
-                responder(
-                    requisicao,
-                    404,
-                    "Produto nao encontrado no banco."
-                );
-                return;
-            }
+    // =====================================================
+    // CADASTRAR LOTE
+    // =====================================================
 
-            // Verifica se o codigo do lote ja existe
-            Document existente = lotes.find(
+    private void cadastrarLote(HttpExchange req)
+        throws IOException {
+
+        Document dados = lerDados(req);
+
+        // NULL INDICA NOVO CADASTRO
+        Document lote = validarLote(
+            dados,
+            null
+        );
+
+        String codigo =
+            lote.getString("codigo");
+
+        if (
+            lotes.find(
                 eq("codigo", codigo)
-            ).first();
+            ).first() != null
+        ) {
 
-            if (existente != null) {
-
-                responder(
-                    requisicao,
-                    409,
-                    "Ja existe um lote com este codigo."
-                );
-                return;
-            }
-
-            // Cria o documento do lote
-            Document lote = new Document()
-                .append("codigo", codigo)
-                .append("itemId", itemId)
-                .append(
-                    "quantidadeInicial",
-                    new Decimal128(quantidade)
-                )
-                .append(
-                    "quantidadeDisponivel",
-                    new Decimal128(quantidade)
-                )
-                .append("dataEntrada", dataEntrada)
-                .append("dataValidade", dataValidade)
-                .append(
-                    "custoTotalAquisicao",
-                    new Decimal128(custoTotal)
-                )
-                .append("observacao", observacao)
-                .append("status", false);
-
-            // Salva o lote no MongoDB
-            lotes.insertOne(lote);
-
-            System.out.println(
-                "Lote cadastrado: " + codigo
+            responder(
+                req,
+                409,
+                "Ja existe um lote com este codigo."
             );
 
-            // Prepara a resposta de sucesso
-            Document resposta = new Document()
+            return;
+        }
+
+        // Quantidade disponível inicial.
+        lote.append(
+            "quantidadeDisponivel",
+            lote.get("quantidadeInicial")
+        );
+
+        // Campo original do banco.
+        lote.append("status", false);
+
+        // Campo de inativação.
+        lote.append("inativo", false);
+
+        lotes.insertOne(lote);
+
+        responderJSON(
+            req,
+            201,
+            new Document()
                 .append(
                     "mensagem",
                     "Lote cadastrado com sucesso!"
@@ -570,109 +649,650 @@ public class LotesHandler implements HttpHandler {
                 .append(
                     "id",
                     lote.getObjectId("_id").toHexString()
-                );
-
-            responderJSON(
-                requisicao,
-                201,
-                resposta
-            );
-
-        } catch (MongoWriteException erro) {
-
-            // Trata codigo duplicado com indice unico
-            if (erro.getError().getCategory()
-                    == ErrorCategory.DUPLICATE_KEY) {
-
-                responder(
-                    requisicao,
-                    409,
-                    "Codigo de lote ja cadastrado."
-                );
-
-            } else {
-
-                System.err.println(
-                    "Erro ao salvar lote: " + erro.getMessage()
-                );
-
-                responder(
-                    requisicao,
-                    500,
-                    "Erro ao salvar lote no MongoDB."
-                );
-            }
-
-        } catch (MongoException erro) {
-
-            System.err.println(
-                "Erro no MongoDB: " + erro.getMessage()
-            );
-
-            responder(
-                requisicao,
-                500,
-                "Erro ao acessar o banco de dados."
-            );
-
-        } catch (IllegalArgumentException erro) {
-
-            System.err.println(
-                "Erro nos valores do lote: " + erro.getMessage()
-            );
-
-            responder(
-                requisicao,
-                400,
-                "Valores numericos invalidos."
-            );
-
-        } catch (Exception erro) {
-
-            System.err.println(
-                "Erro inesperado no cadastro do lote:"
-            );
-
-            erro.printStackTrace();
-
-            responder(
-                requisicao,
-                500,
-                "Erro interno ao cadastrar lote."
-            );
-        }
+                )
+        );
     }
 
-    // Recupera um campo de texto do JSON
-    private static String obterTexto(
-        Document dados,
-        String campo
+    // =====================================================
+    // BUSCAR LOTE PARA EDIÇÃO
+    // =====================================================
+
+    private void buscarLote(
+        HttpExchange req,
+        ObjectId id
+    ) throws IOException {
+
+        Document lote = lotes.find(
+            eq("_id", id)
+        ).first();
+
+        if (lote == null) {
+
+            responder(
+                req,
+                404,
+                "Lote nao encontrado."
+            );
+
+            return;
+        }
+
+        ObjectId itemId =
+            lote.getObjectId("itemId");
+
+        Document resposta = new Document()
+            .append(
+                "id",
+                id.toHexString()
+            )
+            .append(
+                "itemId",
+                itemId != null
+                    ? itemId.toHexString()
+                    : null
+            )
+            .append(
+                "codigo",
+                lote.getString("codigo")
+            )
+            .append(
+                "quantidadeInicial",
+                obterDecimal(
+                    lote,
+                    "quantidadeInicial"
+                ).toPlainString()
+            )
+            .append(
+                "quantidadeDisponivel",
+                obterDecimal(
+                    lote,
+                    "quantidadeDisponivel"
+                ).toPlainString()
+            )
+            .append(
+                "custoTotalAquisicao",
+                obterDecimal(
+                    lote,
+                    "custoTotalAquisicao"
+                ).toPlainString()
+            )
+            .append(
+                "dataEntrada",
+                dataTexto(
+                    lote.getDate("dataEntrada")
+                )
+            )
+            .append(
+                "dataValidade",
+                dataTexto(
+                    lote.getDate("dataValidade")
+                )
+            )
+            .append(
+                "observacao",
+                lote.getString("observacao")
+            )
+            .append(
+                "inativo",
+                lote.getBoolean(
+                    "inativo",
+                    false
+                )
+            )
+            .append(
+                "possuiMovimentacoes",
+                possuiMovimentacoes(id)
+            );
+
+        responderJSON(
+            req,
+            200,
+            new Document("lote", resposta)
+        );
+    }
+
+    // =====================================================
+    // CONSULTAR MOVIMENTAÇÕES
+    // =====================================================
+
+    private boolean possuiMovimentacoes(
+        ObjectId loteId
     ) {
 
-        Object valor = dados.get(campo);
-
-        return valor instanceof String
-            ? (String) valor
-            : "";
+        return movimentacoes.countDocuments(
+            eq("loteId", loteId)
+        ) > 0;
     }
 
-    // Prepara uma resposta de erro em JSON
+    // =====================================================
+    // EDITAR LOTE
+    // =====================================================
+
+    private void atualizarLote(
+        HttpExchange req,
+        ObjectId id
+    ) throws IOException {
+
+        Document existente = lotes.find(
+            eq("_id", id)
+        ).first();
+
+        if (existente == null) {
+
+            responder(
+                req,
+                404,
+                "Lote nao encontrado."
+            );
+
+            return;
+        }
+
+        Document dados = lerDados(req);
+
+        // ID INDICA QUE ESTAMOS EDITANDO
+        Document alteracoes = validarLote(
+            dados,
+            id
+        );
+
+        String codigo =
+            alteracoes.getString("codigo");
+
+        // Verifica código duplicado.
+        Document duplicado = lotes.find(
+            and(
+                eq("codigo", codigo),
+                ne("_id", id)
+            )
+        ).first();
+
+        if (duplicado != null) {
+
+            responder(
+                req,
+                409,
+                "Ja existe um lote com este codigo."
+            );
+
+            return;
+        }
+
+        ObjectId itemAtual =
+            existente.getObjectId("itemId");
+
+        ObjectId itemNovo =
+            alteracoes.getObjectId("itemId");
+
+        BigDecimal quantidadeAtual =
+            obterDecimal(
+                existente,
+                "quantidadeInicial"
+            );
+
+        BigDecimal quantidadeNova =
+            obterDecimal(
+                alteracoes,
+                "quantidadeInicial"
+            );
+
+        BigDecimal saldoAtual =
+            obterDecimal(
+                existente,
+                "quantidadeDisponivel"
+            );
+
+        boolean temMovimentacoes =
+            possuiMovimentacoes(id);
+
+        boolean mudouProduto =
+            !itemAtual.equals(itemNovo);
+
+        boolean mudouQuantidade =
+            quantidadeAtual.compareTo(
+                quantidadeNova
+            ) != 0;
+
+        // Impede alteração de produto e quantidade
+        // quando o lote possui movimentações.
+        if (
+            temMovimentacoes &&
+            (mudouProduto || mudouQuantidade)
+        ) {
+
+            responder(
+                req,
+                409,
+                "Este lote possui movimentacoes. " +
+                "Nao e permitido alterar o produto " +
+                "ou a quantidade recebida."
+            );
+
+            return;
+        }
+
+        // Protege a quantidade disponível.
+        if (
+            mudouQuantidade &&
+            saldoAtual.compareTo(
+                quantidadeAtual
+            ) != 0
+        ) {
+
+            responder(
+                req,
+                409,
+                "A quantidade nao pode ser alterada " +
+                "porque o saldo disponivel ja foi modificado."
+            );
+
+            return;
+        }
+
+        // Se não houver movimentações,
+        // a quantidade disponível acompanha
+        // a nova quantidade recebida.
+        if (mudouQuantidade) {
+
+            alteracoes.append(
+                "quantidadeDisponivel",
+                alteracoes.get("quantidadeInicial")
+            );
+        }
+
+        alteracoes.append(
+            "atualizadoEm",
+            new Date()
+        );
+
+        // Evita sobrescrever o saldo alterado
+        // por outra operação durante a edição.
+        UpdateResult resultado = lotes.updateOne(
+            and(
+                eq("_id", id),
+                eq(
+                    "quantidadeDisponivel",
+                    existente.get("quantidadeDisponivel")
+                ),
+                eq(
+                    "quantidadeInicial",
+                    existente.get("quantidadeInicial")
+                ),
+                eq("itemId", itemAtual)
+            ),
+            new Document("$set", alteracoes)
+        );
+
+        if (resultado.getMatchedCount() == 0) {
+
+            responder(
+                req,
+                409,
+                "Os dados do lote foram modificados. " +
+                "Atualize a pagina e tente novamente."
+            );
+
+            return;
+        }
+
+        responder(
+            req,
+            200,
+            "Lote atualizado com sucesso!"
+        );
+    }
+
+    // =====================================================
+    // VERIFICAR EXCLUSÃO
+    // =====================================================
+
+    private void verificarExclusao(
+        HttpExchange req,
+        ObjectId id
+    ) throws IOException {
+
+        Document lote = lotes.find(
+            eq("_id", id)
+        ).first();
+
+        if (lote == null) {
+
+            responder(
+                req,
+                404,
+                "Lote nao encontrado."
+            );
+
+            return;
+        }
+
+        boolean temMovimentacoes =
+            possuiMovimentacoes(id);
+
+        String mensagem;
+
+        if (temMovimentacoes) {
+
+            mensagem =
+                "Este lote nao pode ser excluido, " +
+                "pois possui movimentacoes registradas. " +
+                "Deseja torna-lo inativo?";
+
+        } else {
+
+            mensagem =
+                "Tem certeza de que deseja excluir este lote? " +
+                "Esta acao nao podera ser desfeita.";
+        }
+
+        responderJSON(
+            req,
+            200,
+            new Document()
+                .append(
+                    "podeExcluir",
+                    !temMovimentacoes
+                )
+                .append(
+                    "possuiMovimentacoes",
+                    temMovimentacoes
+                )
+                .append(
+                    "mensagem",
+                    mensagem
+                )
+        );
+    }
+
+    // =====================================================
+    // EXCLUIR LOTE
+    // =====================================================
+
+    private void excluirLote(
+        HttpExchange req,
+        ObjectId id
+    ) throws IOException {
+
+        Document lote = lotes.find(
+            eq("_id", id)
+        ).first();
+
+        if (lote == null) {
+
+            responder(
+                req,
+                404,
+                "Lote nao encontrado."
+            );
+
+            return;
+        }
+
+        // Confere movimentações novamente.
+        if (possuiMovimentacoes(id)) {
+
+            responderJSON(
+                req,
+                409,
+                new Document()
+                    .append(
+                        "podeExcluir",
+                        false
+                    )
+                    .append(
+                        "mensagem",
+                        "Este lote nao pode ser excluido, " +
+                        "pois possui movimentacoes registradas. " +
+                        "Deseja torna-lo inativo?"
+                    )
+            );
+
+            return;
+        }
+
+        DeleteResult resultado = lotes.deleteOne(
+            eq("_id", id)
+        );
+
+        if (
+            resultado.getDeletedCount() == 0
+        ) {
+
+            responder(
+                req,
+                404,
+                "Lote nao encontrado."
+            );
+
+            return;
+        }
+
+        responder(
+            req,
+            200,
+            "Lote excluido com sucesso!"
+        );
+    }
+
+    // =====================================================
+    // INATIVAR OU REATIVAR LOTE
+    // =====================================================
+
+    private void alterarStatus(
+        HttpExchange req,
+        ObjectId id
+    ) throws IOException {
+
+        Document lote = lotes.find(
+            eq("_id", id)
+        ).first();
+
+        if (lote == null) {
+
+            responder(
+                req,
+                404,
+                "Lote nao encontrado."
+            );
+
+            return;
+        }
+
+        Document dados = lerDados(req);
+
+        Object valor = dados.get("inativo");
+
+        if (!(valor instanceof Boolean)) {
+
+            responder(
+                req,
+                400,
+                "Status invalido."
+            );
+
+            return;
+        }
+
+        boolean inativo = (Boolean) valor;
+
+        UpdateResult resultado = lotes.updateOne(
+            eq("_id", id),
+            new Document(
+                "$set",
+                new Document()
+                    .append(
+                        "inativo",
+                        inativo
+                    )
+                    .append(
+                        "atualizadoEm",
+                        new Date()
+                    )
+            )
+        );
+
+        if (
+            resultado.getMatchedCount() == 0
+        ) {
+
+            responder(
+                req,
+                404,
+                "Lote nao encontrado."
+            );
+
+            return;
+        }
+
+        responder(
+            req,
+            200,
+            inativo
+                ? "Lote inativado com sucesso!"
+                : "Lote reativado com sucesso!"
+        );
+    }
+
+    // =====================================================
+    // LISTAR LOTES
+    // =====================================================
+
+    private void listarLotes(HttpExchange req)
+        throws IOException {
+
+        List<Document> lista =
+            new ArrayList<>();
+
+        for (
+            Document lote : lotes.find()
+                .sort(
+                    new Document("dataEntrada", -1)
+                )
+        ) {
+
+            ObjectId itemId =
+                lote.getObjectId("itemId");
+
+            String nomeProduto =
+                "Produto nao encontrado";
+
+            // Busca o nome do produto.
+            if (itemId != null) {
+
+                Document produto = itens.find(
+                    eq("_id", itemId)
+                ).first();
+
+                if (produto != null) {
+
+                    String nome =
+                        produto.getString("nome");
+
+                    if (nome != null) {
+                        nomeProduto = nome;
+                    }
+                }
+            }
+
+            Document resultado = new Document()
+                .append(
+                    "id",
+                    lote.getObjectId("_id").toHexString()
+                )
+                .append(
+                    "codigo",
+                    lote.getString("codigo")
+                )
+                .append(
+                    "produto",
+                    nomeProduto
+                )
+                .append(
+                    "itemId",
+                    itemId != null
+                        ? itemId.toHexString()
+                        : null
+                )
+                .append(
+                    "quantidadeInicial",
+                    obterDecimal(
+                        lote,
+                        "quantidadeInicial"
+                    ).toPlainString()
+                )
+                .append(
+                    "quantidadeDisponivel",
+                    obterDecimal(
+                        lote,
+                        "quantidadeDisponivel"
+                    ).toPlainString()
+                )
+                .append(
+                    "custoTotalAquisicao",
+                    obterDecimal(
+                        lote,
+                        "custoTotalAquisicao"
+                    ).toPlainString()
+                )
+                .append(
+                    "dataEntrada",
+                    dataTexto(
+                        lote.getDate("dataEntrada")
+                    )
+                )
+                .append(
+                    "dataValidade",
+                    dataTexto(
+                        lote.getDate("dataValidade")
+                    )
+                )
+                .append(
+                    "observacao",
+                    lote.getString("observacao")
+                )
+                .append(
+                    "inativo",
+                    lote.getBoolean(
+                        "inativo",
+                        false
+                    )
+                );
+
+            lista.add(resultado);
+        }
+
+        responderJSON(
+            req,
+            200,
+            new Document(
+                "lotes",
+                lista
+            )
+        );
+    }
+
+    // =====================================================
+    // RESPOSTAS HTTP
+    // =====================================================
+
     private static void responder(
-        HttpExchange requisicao,
+        HttpExchange req,
         int status,
         String mensagem
     ) throws IOException {
 
         responderJSON(
-            requisicao,
+            req,
             status,
-            new Document("mensagem", mensagem)
+            new Document(
+                "mensagem",
+                mensagem
+            )
         );
     }
 
-    // Envia a resposta ao frontend
     private static void responderJSON(
-        HttpExchange requisicao,
+        HttpExchange req,
         int status,
         Document dados
     ) throws IOException {
@@ -680,20 +1300,21 @@ public class LotesHandler implements HttpHandler {
         byte[] resposta = dados.toJson()
             .getBytes(StandardCharsets.UTF_8);
 
-        requisicao.getResponseHeaders().set(
+        req.getResponseHeaders().set(
             "Content-Type",
             "application/json; charset=UTF-8"
         );
 
-        requisicao.sendResponseHeaders(
+        req.sendResponseHeaders(
             status,
             resposta.length
         );
 
         try (
             OutputStream saida =
-                requisicao.getResponseBody()
+                req.getResponseBody()
         ) {
+
             saida.write(resposta);
         }
     }

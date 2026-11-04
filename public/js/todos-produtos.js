@@ -1,346 +1,572 @@
-
 document.addEventListener("DOMContentLoaded", () => {
+
+    const API = "http://localhost:8080/api";
 
     const tabela =
         document.getElementById("tabelaProdutos");
 
-    const API = "http://localhost:8080/api/produtos";
+    const mensagemErro =
+        document.getElementById("mensagemErro");
 
-    // ---------------------------------
-    // FORMATACAO DOS DADOS
-    // ---------------------------------
+    const modal =
+        document.getElementById("modalProduto");
 
-    function formatarNumero(numero) {
+    const modalTitulo =
+        document.getElementById("modalTitulo");
 
-        const valor = Number(numero);
+    const modalTexto =
+        document.getElementById("modalTexto");
 
-        if (!Number.isFinite(valor)) {
-            return "-";
-        }
+    const modalConfirmar =
+        document.getElementById("modalConfirmar");
 
-        return new Intl.NumberFormat("pt-BR", {
-            maximumFractionDigits: 3
-        }).format(valor);
+    const modalCancelar =
+        document.getElementById("modalCancelar");
+
+    let acaoModal = null;
+
+    // ENGRENAGEM
+    const iconeEngrenagem = `
+        <svg xmlns="http://www.w3.org/2000/svg"
+            width="22" height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true">
+
+            <path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/>
+
+            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06-2.84 2.84-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1.06 1.56V21h-4v-.04A1.7 1.7 0 0 0 8.88 19.4 1.7 1.7 0 0 0 7 19.74l-.06.06L4.1 16.96l.06-.06A1.7 1.7 0 0 0 4.5 15a1.7 1.7 0 0 0-1.56-1.06H2.9v-4h.04A1.7 1.7 0 0 0 4.5 8.88 1.7 1.7 0 0 0 4.16 7l-.06-.06L6.94 4.1l.06.06A1.7 1.7 0 0 0 8.88 4.5a1.7 1.7 0 0 0 1.06-1.56V2.9h4v.04A1.7 1.7 0 0 0 15 4.5a1.7 1.7 0 0 0 1.87-.34l.06-.06 2.84 2.84-.06.06A1.7 1.7 0 0 0 19.4 8.88a1.7 1.7 0 0 0 1.56 1.06H21v4h-.04A1.7 1.7 0 0 0 19.4 15Z"/>
+        </svg>
+    `;
+
+    // LIXEIRA
+    const iconeLixeira = `
+        <svg xmlns="http://www.w3.org/2000/svg"
+            width="22" height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true">
+
+            <path d="M3 6h18M8 6V4h8v2M5 6l1 15h12l1-15M10 10v7M14 10v7"/>
+        </svg>
+    `;
+
+    function mostrarErro(texto) {
+
+        mensagemErro.textContent = texto;
+
+        mensagemErro.classList.remove("hidden");
     }
 
-    // Unidade cadastrada no produto.
-    // Exemplo: 1 L, 500 g, 2 un.
-    function formatarUnidade(produto) {
+    // Lê respostas do backend.
+    async function lerResposta(resposta) {
+
+        const texto = await resposta.text();
+
+        let dados = {};
+
+        if (texto) {
+            try {
+                dados = JSON.parse(texto);
+            } catch {
+                dados = { mensagem: texto };
+            }
+        }
+
+        if (!resposta.ok) {
+            throw new Error(
+                dados.mensagem ||
+                dados.erro ||
+                `Erro HTTP ${resposta.status}`
+            );
+        }
+
+        return dados;
+    }
+
+    // Identifica o produto pelo ID do MongoDB.
+    function obterId(produto) {
+
+        const id =
+            produto._id ??
+            produto.id ??
+            produto.produtoId;
+
+        if (typeof id === "string") {
+            return id;
+        }
+
+        if (id && typeof id === "object") {
+            return id.$oid ?? id.oid ?? null;
+        }
+
+        return null;
+    }
+
+    function valorTexto(valor, alternativa = "-") {
 
         if (
-            produto.quantidadeUnidade === null ||
-            produto.quantidadeUnidade === undefined
+            valor === undefined ||
+            valor === null ||
+            valor === ""
+        ) {
+            return alternativa;
+        }
+
+        if (typeof valor === "object") {
+            return valor.nome ||
+                valor.$numberDecimal ||
+                alternativa;
+        }
+
+        return String(valor);
+    }
+
+    // Formata validade.
+    function formatarData(valor) {
+
+        if (!valor) return "-";
+
+        if (typeof valor === "object") {
+            valor = valor.$date || valor.data || null;
+        }
+
+        if (!valor) return "-";
+
+        const texto = String(valor);
+
+        if (/^\d{4}-\d{2}-\d{2}/.test(texto)) {
+
+            const [ano, mes, dia] =
+                texto.slice(0, 10).split("-");
+
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        return texto;
+    }
+
+    // Formata valores monetários.
+    function formatarPreco(valor) {
+
+        if (
+            valor === null ||
+            valor === undefined ||
+            valor === ""
         ) {
             return "-";
         }
 
-        const unidade = {
-            kg: "kg",
-            g: "g",
-            l: "L",
-            ml: "ml",
-            un: "un."
-        };
+        if (typeof valor === "object") {
+            valor = valor.$numberDecimal;
+        }
 
-        const sigla =
-            unidade[produto.unidadeMedida] ||
-            produto.unidadeMedida ||
-            "";
+        const numero = Number(valor);
 
-        return (
-            formatarNumero(produto.quantidadeUnidade) +
-            " " +
-            sigla
-        );
+        return Number.isFinite(numero)
+            ? numero.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL"
+            })
+            : "-";
     }
 
-    // Quantidade total vinda dos lotes.
-    function formatarQuantidade(produto) {
-
-        if (
-            produto.quantidadeTotal === null ||
-            produto.quantidadeTotal === undefined
-        ) {
-            return "-";
-        }
-
-        return formatarNumero(produto.quantidadeTotal) + " un.";
-    }
-
-    // Preco unitario em reais.
-    function formatarPreco(preco) {
-
-        if (preco === null || preco === undefined) {
-            return "-";
-        }
-
-        const numero = Number(preco);
-
-        if (!Number.isFinite(numero)) {
-            return "-";
-        }
-
-        return new Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL"
-        }).format(numero);
-    }
-
-    // Data no formato brasileiro.
-    function formatarData(data) {
-
-        if (!data) {
-            return "-";
-        }
-
-        // Usa a data ISO para evitar mudanca de dia
-        // causada pelo fuso horario do navegador.
-        const partes = String(data).slice(0, 10).split("-");
-
-        if (partes.length !== 3) {
-            return "-";
-        }
-
-        const [ano, mes, dia] = partes;
-
-        return `${dia}/${mes}/${ano}`;
-    }
-
-    // ---------------------------------
-    // ELEMENTOS DA TABELA
-    // ---------------------------------
-
-    function criarCelula(texto, classes = "") {
+    function criarCelula(linha, texto, classeExtra = "") {
 
         const celula = document.createElement("td");
 
-        celula.className =
-            "px-3 py-3 font-semibold " + classes;
+        celula.className = `px-3 py-3 ${classeExtra}`;
 
-        celula.textContent = texto ?? "-";
+        celula.textContent = texto;
+
+        linha.appendChild(celula);
 
         return celula;
     }
 
-    function mostrarMensagem(mensagem) {
+    // Fecha a janela de confirmação.
+    function fecharModal() {
 
-        tabela.replaceChildren();
+        modal.classList.add("hidden");
 
-        const linha = document.createElement("tr");
-        const celula = document.createElement("td");
+        modal.classList.remove("flex");
 
-        celula.colSpan = 8;
-
-        celula.className =
-            "px-3 py-6 text-center text-text-secondary";
-
-        celula.textContent = mensagem;
-
-        linha.appendChild(celula);
-        tabela.appendChild(linha);
+        acaoModal = null;
     }
 
-    // ---------------------------------
-    // LINHA DO PRODUTO
-    // ---------------------------------
+    // Abre a janela de confirmação.
+    function abrirModal(titulo, texto, botao, acao) {
 
-    function criarLinhaProduto(produto) {
+        modalTitulo.textContent = titulo;
 
-        const linha = document.createElement("tr");
+        modalTexto.textContent = texto;
 
-        linha.className =
-            "border-b border-gray-300 bg-[#e9ebee]";
+        modalConfirmar.textContent = botao;
 
-        // TITULO
-        linha.appendChild(
-            criarCelula(
-                produto.nome,
-                "rounded-l-md"
-            )
-        );
+        modalConfirmar.disabled = false;
 
-        // CATEGORIA
-        linha.appendChild(
-            criarCelula(produto.categoria)
-        );
+        acaoModal = acao;
 
-        // UNIDADE DE MEDIDA
-        linha.appendChild(
-            criarCelula(formatarUnidade(produto))
-        );
+        modal.classList.remove("hidden");
 
-        // QUANTIDADE TOTAL
-        linha.appendChild(
-            criarCelula(formatarQuantidade(produto))
-        );
+        modal.classList.add("flex");
 
-        // PRECO UNITARIO
-        linha.appendChild(
-            criarCelula(
-                formatarPreco(produto.precoUnitario)
-            )
-        );
-
-        // VALIDADE
-        linha.appendChild(
-            criarCelula(
-                formatarData(produto.dataValidade)
-            )
-        );
-
-        // STATUS DO PRODUTO
-        const status =
-            produto.status === "ativo"
-                ? "Ativo"
-                : "Inativo";
-
-        linha.appendChild(
-            criarCelula(status)
-        );
-
-        // ---------------------------------
-        // BOTOES DE ACOES
-        // ---------------------------------
-
-        const celulaAcoes = document.createElement("td");
-
-        celulaAcoes.className =
-            "rounded-r-md px-3 py-3";
-
-        const grupoBotoes = document.createElement("div");
-
-        grupoBotoes.className =
-            "flex items-center justify-center gap-3";
-
-        // BOTAO CONFIGURACOES
-        const botaoEditar = document.createElement("button");
-
-        botaoEditar.type = "button";
-        botaoEditar.disabled = true;
-
-        botaoEditar.title =
-            "Edicao sera integrada posteriormente";
-
-        botaoEditar.setAttribute(
-            "aria-label",
-            "Configuracoes do produto"
-        );
-
-        botaoEditar.className =
-            "text-primary-dark disabled:opacity-50";
-
-        botaoEditar.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg"
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                aria-hidden="true">
-
-                <path stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/>
-
-                <path stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.8 1.8-.06-.06A1.7 1.7 0 0 0 16 18.34a1.7 1.7 0 0 0-1 1.56V20h-3v-.1a1.7 1.7 0 0 0-1-1.56 1.7 1.7 0 0 0-1.94.34l-.06.06-1.8-1.8.06-.06A1.7 1.7 0 0 0 7.6 15a1.7 1.7 0 0 0-1.56-1H6v-3h.04A1.7 1.7 0 0 0 7.6 10a1.7 1.7 0 0 0-.34-1.88L7.2 8.06l1.8-1.8.06.06A1.7 1.7 0 0 0 11 6.66 1.7 1.7 0 0 0 12 5.1V5h3v.1a1.7 1.7 0 0 0 1-1.56V5h3v.1a1.7 1.7 0 0 0 1 1.56 1.7 1.7 0 0 0 1.94-.34l.06-.06 1.8 1.8-.06.06A1.7 1.7 0 0 0 19.4 10a1.7 1.7 0 0 0 1.56 1H21v3h-.04A1.7 1.7 0 0 0 19.4 15Z"/>
-            </svg>
-        `;
-
-        // BOTAO EXCLUIR
-        const botaoExcluir = document.createElement("button");
-
-        botaoExcluir.type = "button";
-        botaoExcluir.disabled = true;
-
-        botaoExcluir.title =
-            "Exclusao sera integrada posteriormente";
-
-        botaoExcluir.setAttribute(
-            "aria-label",
-            "Excluir produto"
-        );
-
-        botaoExcluir.className =
-            "text-primary-dark disabled:opacity-50";
-
-        botaoExcluir.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg"
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                aria-hidden="true">
-
-                <path stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v7M14 10v7"/>
-            </svg>
-        `;
-
-        grupoBotoes.appendChild(botaoEditar);
-        grupoBotoes.appendChild(botaoExcluir);
-
-        celulaAcoes.appendChild(grupoBotoes);
-        linha.appendChild(celulaAcoes);
-
-        return linha;
+        modalCancelar.focus();
     }
 
-    // ---------------------------------
-    // BUSCAR PRODUTOS DO BACKEND
-    // ---------------------------------
+    modalCancelar.addEventListener("click", fecharModal);
 
-    async function carregarProdutos() {
+    modal.addEventListener("click", (evento) => {
 
-        mostrarMensagem("Carregando produtos...");
+        if (evento.target === modal) {
+            fecharModal();
+        }
+    });
+
+    document.addEventListener("keydown", (evento) => {
+
+        if (
+            evento.key === "Escape" &&
+            !modal.classList.contains("hidden")
+        ) {
+            fecharModal();
+        }
+    });
+
+    // Executa a ação somente após confirmação.
+    modalConfirmar.addEventListener("click", async () => {
+
+        if (!acaoModal) return;
+
+        modalConfirmar.disabled = true;
+
+        const acao = acaoModal;
 
         try {
 
-            const resposta = await fetch(API);
+            await acao();
 
-            if (!resposta.ok) {
-                throw new Error(
-                    "Nao foi possivel carregar os produtos."
+            fecharModal();
+
+            await carregarProdutos();
+
+        } catch (erro) {
+
+            fecharModal();
+
+            mostrarErro(erro.message);
+
+        } finally {
+
+            modalConfirmar.disabled = false;
+        }
+    });
+
+    // Verifica no backend se o produto pode ser excluído.
+    async function conferirExclusao(id) {
+
+        mensagemErro.classList.add("hidden");
+
+        try {
+
+            const resposta = await fetch(
+                `${API}/produtos/${encodeURIComponent(id)}/exclusao`
+            );
+
+            const dados = await lerResposta(resposta);
+
+            // Produto sem movimentações ou vínculos.
+            if (dados.podeExcluir === true) {
+
+                abrirModal(
+
+                    "Excluir produto",
+
+                    "Tem certeza de que deseja excluir este produto? Esta ação não poderá ser desfeita.",
+
+                    "Excluir produto",
+
+                    async () => {
+
+                        const resposta = await fetch(
+                            `${API}/produtos/${encodeURIComponent(id)}`,
+                            {
+                                method: "DELETE"
+                            }
+                        );
+
+                        const retorno = await lerResposta(resposta);
+
+                        alert(
+                            retorno.mensagem ||
+                            "Produto excluído com sucesso!"
+                        );
+                    }
+                );
+
+            } else {
+
+                // Produto possui movimentações ou vínculos.
+                abrirModal(
+
+                    "Não é possível excluir o produto",
+
+                    "Este produto não pode ser excluído, pois possui movimentações registradas ou vínculos com lotes. Deseja torná-lo inativo?",
+
+                    "Tornar inativo",
+
+                    async () => {
+
+                        const resposta = await fetch(
+                            `${API}/produtos/${encodeURIComponent(id)}/status`,
+                            {
+                                method: "PATCH",
+
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+
+                                body: JSON.stringify({
+                                    status: "inativo"
+                                })
+                            }
+                        );
+
+                        const retorno = await lerResposta(resposta);
+
+                        alert(
+                            retorno.mensagem ||
+                            "Produto inativado com sucesso!"
+                        );
+                    }
                 );
             }
 
-            const dados = await resposta.json();
+        } catch (erro) {
+
+            mostrarErro(
+                `Não foi possível verificar a exclusão: ${erro.message}`
+            );
+        }
+    }
+
+    // Cria botões com os ícones originais.
+    function criarBotao(acao, titulo, icone) {
+
+        const botao = document.createElement("button");
+
+        botao.type = "button";
+
+        botao.title = titulo;
+
+        botao.setAttribute("aria-label", titulo);
+
+        botao.className =
+            "flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded text-primary-dark hover:bg-primary-light";
+
+        botao.innerHTML = icone;
+
+        botao.addEventListener("click", acao);
+
+        return botao;
+    }
+
+    // Carrega todos os produtos do MongoDB.
+    async function carregarProdutos() {
+
+        mensagemErro.classList.add("hidden");
+
+        tabela.replaceChildren();
+
+        const carregando = document.createElement("tr");
+
+        criarCelula(
+            carregando,
+            "Carregando produtos..."
+        ).colSpan = 8;
+
+        tabela.appendChild(carregando);
+
+        try {
+
+            const resposta = await fetch(`${API}/produtos`);
+
+            const dados = await lerResposta(resposta);
+
+            const produtos = Array.isArray(dados)
+                ? dados
+                : dados.produtos || dados.itens || [];
+
+            if (!Array.isArray(produtos)) {
+                throw new Error("Formato inválido da lista de produtos.");
+            }
 
             tabela.replaceChildren();
 
-            if (
-                !Array.isArray(dados.produtos) ||
-                dados.produtos.length === 0
-            ) {
+            if (produtos.length === 0) {
 
-                mostrarMensagem(
-                    "Nenhum produto cadastrado."
+                const linha = document.createElement("tr");
+
+                const celula = criarCelula(
+                    linha,
+                    "Nenhum produto cadastrado.",
+                    "text-center text-text-secondary"
                 );
+
+                celula.colSpan = 8;
+
+                tabela.appendChild(linha);
 
                 return;
             }
 
-            dados.produtos.forEach((produto) => {
+            produtos.forEach((produto) => {
 
-                const linha = criarLinhaProduto(produto);
+                const id = obterId(produto);
+
+                const linha = document.createElement("tr");
+
+                linha.className =
+                    "border-b border-gray-300 bg-[#e9ebee]";
+
+                // Nome
+                criarCelula(
+                    linha,
+                    valorTexto(
+                        produto.nomeProduto ??
+                        produto.nome ??
+                        produto.titulo
+                    )
+                );
+
+                // Categoria
+                criarCelula(
+                    linha,
+                    valorTexto(produto.categoria)
+                );
+
+                // Unidade de medida
+                const unidade = `
+                    ${valorTexto(produto.quantidadeUnidade, "")}
+                    ${valorTexto(produto.unidadeMedida, "")}
+                `.trim();
+
+                criarCelula(
+                    linha,
+                    unidade || "-"
+                );
+
+                // Quantidade disponível
+                criarCelula(
+                    linha,
+                    `${valorTexto(
+                        produto.quantidadeTotal ??
+                        produto.quantidadeDisponivel ??
+                        0,
+                        "0"
+                    )} un.`
+                );
+
+                // Preço unitário
+                criarCelula(
+                    linha,
+                    formatarPreco(
+                        produto.precoUnitario ??
+                        produto.valorUnitario
+                    )
+                );
+
+                // Validade
+                criarCelula(
+                    linha,
+                    formatarData(
+                        produto.validade ??
+                        produto.dataValidade
+                    )
+                );
+
+                // Status
+                const status = valorTexto(
+                    produto.status,
+                    "ativo"
+                );
+
+                criarCelula(
+                    linha,
+                    status.charAt(0).toUpperCase() +
+                    status.slice(1)
+                );
+
+                // AÇÕES
+                const acoes = document.createElement("td");
+
+                acoes.className = "px-3 py-3";
+
+                const grupo = document.createElement("div");
+
+                grupo.className =
+                    "flex items-center justify-center gap-2";
+
+                // BOTÃO ENGRENAGEM
+                const editar = criarBotao(
+
+                    () => {
+                        window.location.href =
+                            `cadastro-produtos.html?id=${encodeURIComponent(id)}`;
+                    },
+
+                    "Editar produto",
+
+                    iconeEngrenagem
+                );
+
+                // BOTÃO LIXEIRA
+                const excluir = criarBotao(
+
+                    () => conferirExclusao(id),
+
+                    "Excluir produto",
+
+                    iconeLixeira
+                );
+
+                if (!id) {
+
+                    editar.disabled = true;
+
+                    excluir.disabled = true;
+
+                    editar.title =
+                        "ID do produto não encontrado";
+
+                    excluir.title =
+                        "ID do produto não encontrado";
+                }
+
+                grupo.append(editar, excluir);
+
+                acoes.appendChild(grupo);
+
+                linha.appendChild(acoes);
 
                 tabela.appendChild(linha);
+
             });
 
         } catch (erro) {
 
-            console.error(
-                "Erro ao carregar produtos:",
-                erro
-            );
+            tabela.replaceChildren();
 
-            mostrarMensagem(
-                "Erro ao carregar produtos. Verifique o backend."
+            mostrarErro(
+                `Erro ao carregar produtos: ${erro.message}`
             );
         }
     }
