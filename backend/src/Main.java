@@ -148,15 +148,18 @@ public class Main {
                         servidor.stop(0);
                         cliente.close();
 
-                    }));
+                // Conecta ao MongoDB Atlas
+                MongoClient cliente = MongoDBConnection.conectar();
 
             servidor.start();
 
-            System.out.println(
-                    "Servidor iniciado em http://localhost:8080/");
+                        // Seleciona o banco
+                        MongoDatabase banco = cliente.getDatabase(
+                                        "desperdicio_alimentos");
 
-            System.out.println(
-                    "MongoDB conectado com sucesso!");
+                        // Verifica a conexão
+                        banco.runCommand(
+                                        new Document("ping", 1));
 
             System.out.println(
                     "Rotas de cadastro e login disponíveis!");
@@ -166,9 +169,103 @@ public class Main {
 
         } catch (Exception erro) {
 
-            cliente.close();
-            throw erro;
+                        // Impede e-mails duplicados
+                        usuarios.createIndex(
+                                        Indexes.ascending("email"),
+                                        new IndexOptions().unique(true));
+
+                        // Cria o servidor HTTP local
+                        HttpServer servidor = HttpServer.create(
+                                        new InetSocketAddress(
+                                                        "127.0.0.1",
+                                                        8080),
+                                        0);
+
+                        // Registra a rota de cadastro
+                        servidor.createContext(
+                                        "/api/usuarios",
+                                        new UsuariosHandler(usuarios));
+
+                        // Colecao de produtos
+                        MongoCollection<Document> produtos = banco.getCollection("itens");
+                        MongoCollection<Document> lotes = banco.getCollection("lotes");
+
+                        // Colecao de movimentacoes - Tela 7
+                        MongoCollection<Document> movimentacoes = banco.getCollection("movimentacoes");
+
+                        // Rota de resumo do Dashboard
+                        servidor.createContext(
+                                        "/api/dashboard/resumo",
+                                        // passo como parâmetro o documento itens que está associado a variável produtos
+                                        new DashboardHandler(produtos, lotes));
+
+                        // Rota de relatório de estoque por produto
+                        RelatoriosHandler relatorioHandler = new RelatoriosHandler(produtos, lotes, movimentacoes);
+
+                        servidor.createContext("/api/relatorios", relatorioHandler);
+
+                        // Colecao de categorias
+                        MongoCollection<Document> categorias = banco.getCollection("categorias");
+
+                        // Handler compartilhado dos produtos, categorias e lotes
+                        ProdutosHandler produtosHandler = new ProdutosHandler(produtos, categorias, lotes);
+
+                        // Rota de cadastro dos produtos
+                        servidor.createContext(
+                                        "/api/produtos",
+                                        produtosHandler);
+
+                        // Rota de consulta das categorias
+                        servidor.createContext(
+                                        "/api/categorias",
+                                        produtosHandler);
+
+                        // Handler responsavel pelo cadastro dos lotes
+                        LotesHandler lotesHandler = new LotesHandler(lotes, produtos);
+
+                        // Registra a rota de cadastro dos lotes
+                        servidor.createContext(
+                                        "/api/lotes",
+                                        lotesHandler);
+
+                        // Rota de proximos vencimentos - Tela 6
+                        servidor.createContext(
+                                        "/api/lotes/proximos-vencimento",
+                                        new ProximosVencimentoHandler(lotes, produtos));
+
+                        // Rota de registro de saidas e desperdicios - Tela 7
+                        servidor.createContext(
+                                        "/api/movimentacoes",
+                                        new MovimentacoesHandler(
+                                                        cliente,
+                                                        lotes,
+                                                        movimentacoes));
+
+                        // Fecha recursos quando o servidor parar
+                        Runtime.getRuntime().addShutdownHook(
+                                        new Thread(() -> {
+
+                                                servidor.stop(0);
+                                                cliente.close();
+
+                                        }));
+
+                        // Inicia o servidor
+                        servidor.start();
+
+                        System.out.println(
+                                        "Servidor iniciado em http://localhost:8080/");
+
+                        System.out.println(
+                                        "MongoDB conectado com sucesso!");
+
+                } catch (Exception erro) {
+
+                        cliente.close();
+                        throw erro;
+
+                }
 
         }
-    }
+
 }
