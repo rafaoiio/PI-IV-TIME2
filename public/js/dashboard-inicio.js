@@ -192,9 +192,50 @@ async function carregarEvolucaoMensal() {
   }
 }
 
+async function carregarNomeUsuario() {
+  const elementoNome = document.querySelector("#nome-usuario");
+
+  // Recupera o token salvo durante o login
+  const token = sessionStorage.getItem("token");
+
+  if (!token) {
+    elementoNome.textContent = "Visitante";
+    return;
+  }
+
+  try {
+    const resposta = await fetch(`${API_URL}/api/usuario`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // Sessão inválida ou expirada
+    if (resposta.status === 401) {
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("usuario");
+
+      elementoNome.textContent = "Sessão expirada";
+      return;
+    }
+
+    if (!resposta.ok) {
+      throw new Error("Erro ao consultar usuário");
+    }
+
+    const usuario = await resposta.json();
+
+    elementoNome.textContent = usuario.nome || "Usuário";
+  } catch (erro) {
+    console.error("Erro ao carregar nome:", erro);
+    elementoNome.textContent = "Usuário indisponível";
+  }
+}
+
 const elemento = document.querySelector("#area-chart");
 const grafico = new ApexCharts(elemento, options);
 
+carregarNomeUsuario();
 carregarIndicadores();
 carregarProximosVencimentos();
 grafico.render().then(() => {
