@@ -39,19 +39,21 @@
         </div>
 
         
-          <div class=" flex items-center gap-8 mt-5 h-full justify-center">
-            <div class="bg-white rounded-xl shadow-md p-6 w-60 text-center transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl text-text font-semibold">
-              120 produtos
-            </div>
+<div class="flex items-center gap-8 mt-5 h-full justify-center">
 
-            <div class="bg-white rounded-xl shadow-md p-6 w-60 text-center transition-all duration-300 ease-in-out hover:-translate-y-1  hover:shadow-xl text-text font-semibold">
-              40 próx. Vencimento
-            </div>
+  <div class="bg-white rounded-xl shadow-md p-6 w-60 text-center transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl text-text font-semibold">
+    <span id="total-produtos">--</span> produtos
+  </div>
 
-            <div class="bg-white rounded-xl shadow-md p-6 w-60 text-center transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl text-text font-semibold">
-              30 Desperdício
-            </div>
-          </div>
+  <div class="bg-white rounded-xl shadow-md p-6 w-60 text-center transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl text-text font-semibold">
+    <span id="lotes-proximos">--</span> lotes próx. vencimento
+  </div>
+
+  <div class="bg-white rounded-xl shadow-md p-6 w-60 text-center transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl text-text font-semibold">
+    <span id="total-desperdicios">--</span> ocorrências de desperdício
+  </div>
+
+</div>
 
           <section class="mt-6 w-full rounded-xl bg-white px-5 py-4 text-text shadow-md sm:px-10">
             <h2 id="titulo-vencimentos" clas="text-xs font-medium">
@@ -75,23 +77,9 @@
                   </tr>
                 </thead>
 
-                <tbody>
+                <tbody id="tabela-proximos-vencimentos">
                   <tr>
-                    <td>
-                      Leite
-                    </td>
-                    <td>
-                      10 un.
-                    </td>
-                    <td class="text-danger">
-                      Vence hoje
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>Tomate</td>
-                    <td>15kg</td>
-                    <td class="text-danger">Vence amanhã</td>
+                    <td colspan="3">Carregando vencimentos...</td>
                   </tr>
                 </tbody>
               </table>

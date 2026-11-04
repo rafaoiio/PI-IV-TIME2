@@ -13,6 +13,10 @@ import org.bson.Document;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -61,10 +65,18 @@ public class RelatoriosHandler implements HttpHandler {
         Supplier<Document> consulta = switch (caminho) {
             case "/api/relatorios/estoque-por-produto" ->
                 relatoriosService::consultarEstoquePorProduto;
+            case "/api/relatorios/financeiro-por-produto" ->
+                relatoriosService::consultarFinanceiroPorProduto;
             case "/api/relatorios/desperdicios/por-produto" ->
                 relatoriosService::consultarDesperdicioPorProduto;
             case "/api/relatorios/desperdicios/por-motivo" ->
                 relatoriosService::consultaDesperdicioPorMotivo;
+            case "/api/relatorios/desperdicios/por-periodo" ->
+                () -> consultarDesperdicioPorPeriodo(requisicao);
+            case "/api/relatorios/indicadores" ->
+                relatoriosService::consultaIndicadoresGerais;
+            case "/api/relatorios/desperdicios/evolucao-mensal" ->
+                relatoriosService::consultarEvolucaoMensal;
             default -> null;
         };
 
@@ -90,9 +102,45 @@ public class RelatoriosHandler implements HttpHandler {
         try {
             Document relatorio = consulta.get();
             responderJSON(requisicao, 200, relatorio);
+        } catch (IllegalArgumentException erro) {
+            responder(requisicao, 400, erro.getMessage());
         } catch (MongoException e) {
             responder(requisicao, 500, "Erro ao acessar o banco de Dados.");
         }
+    }
+
+    private Document consultarDesperdicioPorPeriodo(HttpExchange requisicao) {
+        String query = requisicao.getRequestURI().getRawQuery();
+
+        if (query == null || query.isBlank()) {
+            throw new IllegalArgumentException("Informe as datas de inicío e fim.");
+        }
+
+        Map<String, String> parametros = new HashMap<>();
+
+        for (String parte : query.split("&")) {
+            String[] par = parte.split("=", 2);
+
+            if (par.length != 2 || !Set.of("inicio", "fim").contains(par[0])
+                    || parametros.putIfAbsent(par[0], par[1]) != null) {
+                throw new IllegalArgumentException("Parâmetros inválidos");
+            }
+        }
+
+        LocalDate inicio;
+        LocalDate fim;
+        try {
+            inicio = LocalDate.parse(parametros.getOrDefault("inicio", ""));
+            fim = LocalDate.parse(parametros.getOrDefault("fim", ""));
+        } catch (DateTimeParseException erro) {
+            throw new IllegalArgumentException("As datas devem estar no formato AAAA-MM-DD");
+        }
+
+        if (inicio.isAfter(fim)) {
+            throw new IllegalArgumentException("A data inicial não pode ser posterior à final");
+        }
+
+        return relatoriosService.consultaDesperdicioPorPeriodo(inicio, fim);
     }
 
     private static void responder(
