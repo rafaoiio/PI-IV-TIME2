@@ -1,3 +1,4 @@
+// Código feito por Lucas David de Sousa RA: 25895152
 
 document.addEventListener("DOMContentLoaded", function () {
 

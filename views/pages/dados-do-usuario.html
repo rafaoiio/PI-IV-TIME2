@@ -1,3 +1,5 @@
+<!-- Código feito por Lucas David de Sousa RA: 25895152 -->
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -20,9 +22,7 @@
 
 <body class="flex min-h-screen bg-background">
 
-  <!-- ====================================== -->
-  <!-- SIDEBAR                                -->
-  <!-- ====================================== -->
+  <!-- Sidebar -->
 
   <aside
     id="aside-placeholder"
@@ -30,9 +30,7 @@
   ></aside>
 
 
-  <!-- ====================================== -->
-  <!-- ÁREA PRINCIPAL                         -->
-  <!-- ====================================== -->
+  <!-- Área principal -->
 
   <div class="flex min-w-0 flex-1 flex-col">
 
@@ -40,9 +38,7 @@
     <div id="header-placeholder"></div>
 
 
-    <!-- ==================================== -->
-    <!-- CONTEÚDO DA PÁGINA                  -->
-    <!-- ==================================== -->
+    <!-- Conteúdo da página -->
 
     <main class="flex-1">
 
@@ -57,13 +53,18 @@
             text-text
           "
         >
-          Dados Usuário
+          Dados do Usuário
         </h1>
 
+        <!-- Retorno de carregamento, erro e sucesso da API -->
+        <p
+          id="statusPerfil"
+          role="status"
+          aria-live="polite"
+          class="mb-6 hidden rounded-[6px] border border-border bg-white px-4 py-3 text-[12px] text-text"
+        ></p>
 
-        <!-- ================================== -->
-        <!-- CARD DO USUÁRIO                   -->
-        <!-- ================================== -->
+        <!-- Card do usuário -->
 
         <section
           class="
@@ -81,9 +82,7 @@
         >
 
 
-          <!-- ================================= -->
-          <!-- COLUNA ESQUERDA                   -->
-          <!-- ================================= -->
+          <!-- Coluna esquerda -->
 
           <div>
 
@@ -97,13 +96,11 @@
                 text-text
               "
             >
-              Fulano da Silva
+              Carregando...
             </h2>
 
 
-            <!-- ================================= -->
-            <!-- E-MAIL                            -->
-            <!-- ================================= -->
+            <!-- E-mail -->
 
             <div class="mb-5">
 
@@ -120,7 +117,7 @@
                   </span>
 
                   <span id="emailUsuario">
-                    fulano@gmail.com
+                    —
                   </span>
 
                 </p>
@@ -257,7 +254,7 @@
               </span>
 
               <span id="cargoUsuario">
-                Estoquista
+                Não informado
               </span>
 
             </p>
@@ -266,16 +263,12 @@
 
 
 
-          <!-- ================================= -->
-          <!-- COLUNA CENTRAL                    -->
-          <!-- ================================= -->
+          <!-- Coluna central -->
 
           <div class="lg:pt-9">
 
 
-            <!-- ================================= -->
-            <!-- TELEFONE                          -->
-            <!-- ================================= -->
+            <!-- Telefone -->
 
             <div class="mb-5">
 
@@ -292,7 +285,7 @@
                   </span>
 
                   <span id="telefoneUsuario">
-                    (19) 99999-4444
+                    —
                   </span>
 
                 </p>
@@ -424,9 +417,7 @@
 
 
 
-            <!-- ================================= -->
-            <!-- SENHA                             -->
-            <!-- ================================= -->
+            <!-- Senha -->
 
             <div class="flex items-center gap-3">
 
@@ -465,9 +456,7 @@
 
 
 
-          <!-- ================================= -->
-          <!-- FOTO                              -->
-          <!-- ================================= -->
+          <!-- Foto -->
 
           <div
             class="
@@ -500,7 +489,7 @@
                   text-text
                 "
               >
-                foto?
+                ?
               </span>
 
 
@@ -600,9 +589,7 @@
 
 
 
-  <!-- ====================================== -->
-  <!-- MODAL - ALTERAR SENHA                  -->
-  <!-- ====================================== -->
+  <!-- Modal - Alterar senha -->
 
   <div
     id="modalAlterarSenha"
@@ -650,9 +637,22 @@
 
 
 
-      <!-- ================================= -->
-      <!-- NOVA SENHA                        -->
-      <!-- ================================= -->
+      <!-- Senha atual: necessária para autorizar a alteração -->
+      <div class="mb-4">
+        <label for="senhaAtual" class="mb-1.5 block text-[13px] text-text">
+          Senha atual
+        </label>
+        <input
+          id="senhaAtual"
+          type="password"
+          autocomplete="current-password"
+          maxlength="1000"
+          placeholder="Digite sua senha atual"
+          class="h-[36px] w-full rounded-[4px] border border-border bg-white px-3 text-[13px] text-text outline-none placeholder:text-text-secondary focus:border-primary"
+        >
+      </div>
+
+      <!-- Nova senha -->
 
       <div class="mb-4">
 
@@ -742,9 +742,7 @@
 
 
 
-      <!-- ================================= -->
-      <!-- CONFIRMAR SENHA                   -->
-      <!-- ================================= -->
+      <!-- Confirmar nova senha -->
 
       <div>
 
@@ -904,9 +902,7 @@
 
 
 
-  <!-- ====================================== -->
-  <!-- JAVASCRIPT                             -->
-  <!-- ====================================== -->
+  <!-- JavaScript -->
 
   <script src="../../public/js/load-partials.js"></script>
   <script src="../../public/js/dados-do-usuario.js"></script>
